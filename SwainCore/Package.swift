@@ -25,6 +25,9 @@ let package = Package(
             dependencies: [
                 .product(name: "AsyncHTTPClient", package: "async-http-client"),
                 .product(name: "FoundationPreview", package: "swift-foundation")
+            ],
+            resources: [
+                .process("Resources")
             ]
         ),
         .testTarget(
@@ -32,6 +35,9 @@ let package = Package(
             dependencies: [
                 .byName(name: "SwainCore"),
                 .product(name: "Testing", package: "swift-testing")
+            ],
+            resources: [
+                .process("Resources")
             ]
         )
     ]

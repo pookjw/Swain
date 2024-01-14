@@ -1,0 +1,10 @@
+{
+    "ref": "refs/tags/swift-DEVELOPMENT-SNAPSHOT-2024-01-11-a",
+    "node_id": "MDM6UmVmNDQ4Mzg5NDk6cmVmcy90YWdzL3N3aWZ0LURFVkVMT1BNRU5ULVNOQVBTSE9ULTIwMjQtMDEtMTEtYQ==",
+    "url": "https://api.github.com/repos/apple/swift/git/refs/tags/swift-DEVELOPMENT-SNAPSHOT-2024-01-11-a",
+    "object": {
+        "sha": "3d2833eb3c1c45e98477ef36aaeab74624f5aed2",
+        "type": "tag",
+        "url": "https://api.github.com/repos/apple/swift/git/tags/3d2833eb3c1c45e98477ef36aaeab74624f5aed2"
+    }
+}
