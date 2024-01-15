@@ -17,14 +17,16 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/swift-server/async-http-client.git", branch: "main"),
         .package(url: "https://github.com/apple/swift-foundation.git", branch: "main"),
-        .package(url: "https://github.com/apple/swift-testing.git", branch: "main")
+        .package(url: "https://github.com/apple/swift-testing.git", branch: "main"),
+        .package(url: "https://github.com/pookjw/HandyMacros.git", branch: "main")
     ],
     targets: [
         .target(
             name: "SwainCore",
             dependencies: [
                 .product(name: "AsyncHTTPClient", package: "async-http-client"),
-                .product(name: "FoundationPreview", package: "swift-foundation")
+                .product(name: "FoundationPreview", package: "swift-foundation"),
+                .product(name: "HandyMacros", package: "HandyMacros")
             ],
             resources: [
                 .process("Resources")

@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "handymacros",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pookjw/HandyMacros.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8ae217c99f2c57ef4e251f499e8245f0a4d255c1"
+      }
+    },
+    {
       "identity" : "swift-algorithms",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-algorithms",
@@ -130,8 +139,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
-        "revision" : "43c802fb7f96e090dde015344a94b5e85779eff1",
-        "version" : "509.1.0"
+        "branch" : "main",
+        "revision" : "4dcc4ac199c2b31f24a3b1cf92b58852dd6e919f"
       }
     },
     {
