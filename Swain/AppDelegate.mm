@@ -1,11 +1,12 @@
 //
-//  AppDelegate.m
+//  AppDelegate.mm
 //  Swain
 //
 //  Created by Jinwoo Kim on 1/15/24.
 //
 
-#import "AppDelegate.h"
+#import "AppDelegate.hpp"
+#import "MainWindow.hpp"
 
 @interface AppDelegate ()
 
@@ -15,7 +16,10 @@
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
+    MainWindow *window = [MainWindow new];
+    window.releasedWhenClosed = NO;
+    [window makeKeyAndOrderFront:self];
+    [window release];
 }
 
 

@@ -7,24 +7,44 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4FE08D102B54EB1B003D9FE2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.m */; };
-		4FE08D132B54EB1B003D9FE2 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D122B54EB1B003D9FE2 /* ViewController.m */; };
+		4FE08D102B54EB1B003D9FE2 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */; };
 		4FE08D152B54EB1C003D9FE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4FE08D142B54EB1C003D9FE2 /* Assets.xcassets */; };
-		4FE08D182B54EB1C003D9FE2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4FE08D162B54EB1C003D9FE2 /* Main.storyboard */; };
-		4FE08D1A2B54EB1C003D9FE2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D192B54EB1C003D9FE2 /* main.m */; };
+		4FE08D1A2B54EB1C003D9FE2 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D192B54EB1C003D9FE2 /* main.mm */; };
 		4FE08D232B54EB34003D9FE2 /* SwainCore in Frameworks */ = {isa = PBXBuildFile; productRef = 4FE08D222B54EB34003D9FE2 /* SwainCore */; };
+		4FE08D262B54F7FF003D9FE2 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE08D252B54F7FF003D9FE2 /* CoreData.framework */; };
+		4FE08D282B54F803003D9FE2 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE08D272B54F803003D9FE2 /* Cocoa.framework */; };
+		4FE08D2A2B54F807003D9FE2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE08D292B54F807003D9FE2 /* QuartzCore.framework */; };
+		4FE08D2C2B54F80C003D9FE2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FE08D2B2B54F80C003D9FE2 /* CoreGraphics.framework */; };
+		4FE08D302B54F8AB003D9FE2 /* MainWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D2F2B54F8AB003D9FE2 /* MainWindow.mm */; };
+		4FE08D332B54FB2E003D9FE2 /* MainSidebarViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D322B54FB2E003D9FE2 /* MainSidebarViewController.mm */; };
+		4FE08D362B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D352B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm */; };
+		4FE08D3A2B54FE80003D9FE2 /* ToolchainsViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D392B54FE80003D9FE2 /* ToolchainsViewController.mm */; };
+		4FE08D442B5511B9003D9FE2 /* MainSidebarTableRowView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D432B5511B9003D9FE2 /* MainSidebarTableRowView.mm */; };
+		4FE08D462B5511C3003D9FE2 /* MainSidebarTableRowView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4FE08D452B5511C3003D9FE2 /* MainSidebarTableRowView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		4FE08D0B2B54EB1B003D9FE2 /* Swain.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Swain.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		4FE08D112B54EB1B003D9FE2 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		4FE08D122B54EB1B003D9FE2 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AppDelegate.hpp; sourceTree = "<group>"; };
+		4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
 		4FE08D142B54EB1C003D9FE2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		4FE08D172B54EB1C003D9FE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		4FE08D192B54EB1C003D9FE2 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4FE08D192B54EB1C003D9FE2 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		4FE08D1B2B54EB1C003D9FE2 /* Swain.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Swain.entitlements; sourceTree = "<group>"; };
+		4FE08D252B54F7FF003D9FE2 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		4FE08D272B54F803003D9FE2 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		4FE08D292B54F807003D9FE2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		4FE08D2B2B54F80C003D9FE2 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		4FE08D2E2B54F8AB003D9FE2 /* MainWindow.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainWindow.hpp; sourceTree = "<group>"; };
+		4FE08D2F2B54F8AB003D9FE2 /* MainWindow.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainWindow.mm; sourceTree = "<group>"; };
+		4FE08D312B54FB2E003D9FE2 /* MainSidebarViewController.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainSidebarViewController.hpp; sourceTree = "<group>"; };
+		4FE08D322B54FB2E003D9FE2 /* MainSidebarViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainSidebarViewController.mm; sourceTree = "<group>"; };
+		4FE08D342B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+Foundation_IvarDescription.h"; sourceTree = "<group>"; };
+		4FE08D352B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSObject+Foundation_IvarDescription.mm"; sourceTree = "<group>"; };
+		4FE08D382B54FE80003D9FE2 /* ToolchainsViewController.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsViewController.hpp; sourceTree = "<group>"; };
+		4FE08D392B54FE80003D9FE2 /* ToolchainsViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsViewController.mm; sourceTree = "<group>"; };
+		4FE08D422B5511B9003D9FE2 /* MainSidebarTableRowView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainSidebarTableRowView.h; sourceTree = "<group>"; };
+		4FE08D432B5511B9003D9FE2 /* MainSidebarTableRowView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainSidebarTableRowView.mm; sourceTree = "<group>"; };
+		4FE08D452B5511C3003D9FE2 /* MainSidebarTableRowView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainSidebarTableRowView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,7 +52,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FE08D2A2B54F807003D9FE2 /* QuartzCore.framework in Frameworks */,
 				4FE08D232B54EB34003D9FE2 /* SwainCore in Frameworks */,
+				4FE08D262B54F7FF003D9FE2 /* CoreData.framework in Frameworks */,
+				4FE08D2C2B54F80C003D9FE2 /* CoreGraphics.framework in Frameworks */,
+				4FE08D282B54F803003D9FE2 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +68,7 @@
 			children = (
 				4FE08D0D2B54EB1B003D9FE2 /* Swain */,
 				4FE08D0C2B54EB1B003D9FE2 /* Products */,
+				4FE08D242B54F7FF003D9FE2 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,16 +83,51 @@
 		4FE08D0D2B54EB1B003D9FE2 /* Swain */ = {
 			isa = PBXGroup;
 			children = (
-				4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.h */,
-				4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.m */,
-				4FE08D112B54EB1B003D9FE2 /* ViewController.h */,
-				4FE08D122B54EB1B003D9FE2 /* ViewController.m */,
+				4FE08D342B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.h */,
+				4FE08D352B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm */,
+				4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.hpp */,
+				4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */,
+				4FE08D2D2B54F842003D9FE2 /* Main */,
+				4FE08D372B54FE72003D9FE2 /* Toolchains */,
 				4FE08D142B54EB1C003D9FE2 /* Assets.xcassets */,
-				4FE08D162B54EB1C003D9FE2 /* Main.storyboard */,
-				4FE08D192B54EB1C003D9FE2 /* main.m */,
+				4FE08D192B54EB1C003D9FE2 /* main.mm */,
 				4FE08D1B2B54EB1C003D9FE2 /* Swain.entitlements */,
 			);
 			path = Swain;
+			sourceTree = "<group>";
+		};
+		4FE08D242B54F7FF003D9FE2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4FE08D2B2B54F80C003D9FE2 /* CoreGraphics.framework */,
+				4FE08D292B54F807003D9FE2 /* QuartzCore.framework */,
+				4FE08D272B54F803003D9FE2 /* Cocoa.framework */,
+				4FE08D252B54F7FF003D9FE2 /* CoreData.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		4FE08D2D2B54F842003D9FE2 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				4FE08D2E2B54F8AB003D9FE2 /* MainWindow.hpp */,
+				4FE08D2F2B54F8AB003D9FE2 /* MainWindow.mm */,
+				4FE08D312B54FB2E003D9FE2 /* MainSidebarViewController.hpp */,
+				4FE08D322B54FB2E003D9FE2 /* MainSidebarViewController.mm */,
+				4FE08D422B5511B9003D9FE2 /* MainSidebarTableRowView.h */,
+				4FE08D432B5511B9003D9FE2 /* MainSidebarTableRowView.mm */,
+				4FE08D452B5511C3003D9FE2 /* MainSidebarTableRowView.xib */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		4FE08D372B54FE72003D9FE2 /* Toolchains */ = {
+			isa = PBXGroup;
+			children = (
+				4FE08D382B54FE80003D9FE2 /* ToolchainsViewController.hpp */,
+				4FE08D392B54FE80003D9FE2 /* ToolchainsViewController.mm */,
+			);
+			path = Toolchains;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -133,8 +193,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FE08D462B5511C3003D9FE2 /* MainSidebarTableRowView.xib in Resources */,
 				4FE08D152B54EB1C003D9FE2 /* Assets.xcassets in Resources */,
-				4FE08D182B54EB1C003D9FE2 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,24 +205,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FE08D132B54EB1B003D9FE2 /* ViewController.m in Sources */,
-				4FE08D1A2B54EB1C003D9FE2 /* main.m in Sources */,
-				4FE08D102B54EB1B003D9FE2 /* AppDelegate.m in Sources */,
+				4FE08D332B54FB2E003D9FE2 /* MainSidebarViewController.mm in Sources */,
+				4FE08D442B5511B9003D9FE2 /* MainSidebarTableRowView.mm in Sources */,
+				4FE08D1A2B54EB1C003D9FE2 /* main.mm in Sources */,
+				4FE08D362B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm in Sources */,
+				4FE08D102B54EB1B003D9FE2 /* AppDelegate.mm in Sources */,
+				4FE08D3A2B54FE80003D9FE2 /* ToolchainsViewController.mm in Sources */,
+				4FE08D302B54F8AB003D9FE2 /* MainWindow.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		4FE08D162B54EB1C003D9FE2 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4FE08D172B54EB1C003D9FE2 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		4FE08D1C2B54EB1C003D9FE2 /* Debug */ = {
@@ -174,7 +227,7 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -235,7 +288,7 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -293,13 +346,16 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-fcxx-modules",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pookjw.Swain;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -319,13 +375,16 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-fcxx-modules",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pookjw.Swain;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
