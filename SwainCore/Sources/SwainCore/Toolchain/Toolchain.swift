@@ -11,15 +11,22 @@ import RegexBuilder
 
 @Model
 public final class Toolchain: Hashable, Sendable {
+    public enum Category: String, Hashable, Sendable {
+        case stable, release, main
+    }
+    
     public var category: Category {
         @storageRestrictions(accesses: _$backingData, initializes: __category)
         init(initialValue) {
-            _$backingData.setTransformableValue(forKey: \._category, to: .init(category: initialValue))
+            _$backingData.setValue(forKey: \._category, to: initialValue.rawValue)
             __category = _SwiftDataNoType()
         }
         get {
-            _category.category
+            .init(rawValue: _category)!
         }
+//        set {
+//            _category = newValue.rawValue
+//        }
     }
     
     public var packageURLString: String? {
@@ -81,7 +88,7 @@ public final class Toolchain: Hashable, Sendable {
     }
     
     @Attribute(.unique, originalName: "name") public let name: String
-    @Attribute(.transformable(by: _CategoryValueTransformer.self), originalName: "category") let _category: _Category
+    @Attribute(originalName: "category") public let _category: String
     
     init?(refName: String) {
         guard let name: String = Self.getTagName(refName: refName) else {
@@ -171,93 +178,5 @@ public final class Toolchain: Hashable, Sendable {
         }
         
         return String(match)
-    }
-}
-
-extension Toolchain {
-    public enum Category: Hashable, Sendable {
-        case stable, release, main
-    }
-    
-    @_objcRuntimeName(_TtCC9SwainCore9Toolchain9_Category) final class _Category: NSObject, NSSecureCoding {
-        static let supportsSecureCoding: Bool = true
-        
-        let category: Category
-        
-        init(category: Category) {
-            self.category = category
-            super.init()
-        }
-        
-        init?(coder: NSCoder) {
-            guard let value: String = coder.decodeObject(forKey: "category") as? String else {
-                return nil
-            }
-            
-            switch value {
-            case "stable":
-                self.category = .stable
-            case "release":
-                self.category = .release
-            case "main":
-                self.category = .main
-            default:
-                return nil
-            }
-            
-            super.init()
-        }
-        
-        func encode(with coder: NSCoder) {
-            switch category {
-            case .stable:
-                coder.encode("stable", forKey: "category")
-            case .release:
-                coder.encode("release", forKey: "category")
-            case .main:
-                coder.encode("main", forKey: "category")
-            }
-        }
-    }
-    
-    final class _CategoryValueTransformer: ValueTransformer {
-        override class func allowsReverseTransformation() -> Bool {
-            true
-        }
-        
-        override class func transformedValueClass() -> AnyClass {
-            _Category.self
-        }
-        
-        override func transformedValue(_ value: Any?) -> Any? {
-            guard let category: _Category = value as? _Category else {
-                return nil
-            }
-            
-            do {
-                let data: Data = try NSKeyedArchiver.archivedData(withRootObject: category, requiringSecureCoding: true)
-                return data
-            } catch {
-                print(error.localizedDescription)
-                return nil
-            }
-        }
-        
-        override func reverseTransformedValue(_ value: Any?) -> Any? {
-            guard let data: Data = value as? Data else {
-                return nil
-            }
-            
-            do {
-                guard let category: _Category = try NSKeyedUnarchiver.unarchivedObject(ofClass: _Category.self, from: data) else {
-                    return nil
-                }
-                
-                return category
-            } catch {
-                print(error.localizedDescription)
-                return nil
-            }
-        }
     }
 }

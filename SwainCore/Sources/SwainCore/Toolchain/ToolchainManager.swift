@@ -33,9 +33,17 @@ public actor ToolchainManager: NSObject {
     public func configure() async throws {
         guard modelContext == nil else { return }
         
-        ValueTransformer.setValueTransformer(Toolchain._CategoryValueTransformer(), forName: .init("_CategoryValueTransformer"))
+        let url: URL = .applicationSupportDirectory
+            .appending(component: "Toolchain", directoryHint: .notDirectory)
+            .appendingPathExtension("sqlite")
         
-        let configuration: ModelConfiguration = .init()
+        let configuration: ModelConfiguration = .init(
+            "Toolchain",
+            url: url
+        )
+        
+        print(configuration.url)
+        
         let modelContainer: ModelContainer = try .init(for: Toolchain.self, configurations: configuration)
         
         self.modelContainer = modelContainer
@@ -61,5 +69,23 @@ public actor ToolchainManager: NSObject {
             
             try modelContext.save()
         }
+    }
+    
+    @_spi(SwainCoreTests) public func destory() async throws {
+        guard let modelContainer: ModelContainer else { return }
+        
+        modelContainer.deleteAllData()
+        
+        for configuration in modelContainer.configurations {
+            let url: URL = configuration.url
+            let lastPathComponent: String = url.lastPathComponent
+            
+            try FileManager.default.removeItem(at: url)
+            try FileManager.default.removeItem(at: url.deletingLastPathComponent().appending(component: "\(lastPathComponent)-shm"))
+            try FileManager.default.removeItem(at: url.deletingLastPathComponent().appending(component: "\(lastPathComponent)-wal"))
+        }
+        
+        self.modelContext = nil
+        self.modelContainer = nil
     }
 }

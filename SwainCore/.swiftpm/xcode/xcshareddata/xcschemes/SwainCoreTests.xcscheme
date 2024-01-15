@@ -39,7 +39,7 @@
          <EnvironmentVariable
             key = "SWT_SELECTED_TAGS"
             value = "test_managedObjectContext"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>
