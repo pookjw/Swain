@@ -21,6 +21,7 @@
 		4FE08D3A2B54FE80003D9FE2 /* ToolchainsViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D392B54FE80003D9FE2 /* ToolchainsViewController.mm */; };
 		4FE08D442B5511B9003D9FE2 /* MainSidebarTableCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D432B5511B9003D9FE2 /* MainSidebarTableCellView.mm */; };
 		4FE08D462B5511C3003D9FE2 /* MainSidebarTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4FE08D452B5511C3003D9FE2 /* MainSidebarTableCellView.xib */; };
+		4FE64ABD2B58203700558BCC /* MainSidebarItemModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE64ABC2B58203700558BCC /* MainSidebarItemModel.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,9 +43,11 @@
 		4FE08D352B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSObject+Foundation_IvarDescription.mm"; sourceTree = "<group>"; };
 		4FE08D382B54FE80003D9FE2 /* ToolchainsViewController.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsViewController.hpp; sourceTree = "<group>"; };
 		4FE08D392B54FE80003D9FE2 /* ToolchainsViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsViewController.mm; sourceTree = "<group>"; };
-		4FE08D422B5511B9003D9FE2 /* MainSidebarTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainSidebarTableCellView.h; sourceTree = "<group>"; };
+		4FE08D422B5511B9003D9FE2 /* MainSidebarTableCellView.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainSidebarTableCellView.hpp; sourceTree = "<group>"; };
 		4FE08D432B5511B9003D9FE2 /* MainSidebarTableCellView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainSidebarTableCellView.mm; sourceTree = "<group>"; };
 		4FE08D452B5511C3003D9FE2 /* MainSidebarTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainSidebarTableCellView.xib; sourceTree = "<group>"; };
+		4FE64ABB2B58203700558BCC /* MainSidebarItemModel.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainSidebarItemModel.hpp; sourceTree = "<group>"; };
+		4FE64ABC2B58203700558BCC /* MainSidebarItemModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainSidebarItemModel.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,7 +117,9 @@
 				4FE08D2F2B54F8AB003D9FE2 /* MainWindow.mm */,
 				4FE08D312B54FB2E003D9FE2 /* MainSidebarViewController.hpp */,
 				4FE08D322B54FB2E003D9FE2 /* MainSidebarViewController.mm */,
-				4FE08D422B5511B9003D9FE2 /* MainSidebarTableCellView.h */,
+				4FE64ABB2B58203700558BCC /* MainSidebarItemModel.hpp */,
+				4FE64ABC2B58203700558BCC /* MainSidebarItemModel.mm */,
+				4FE08D422B5511B9003D9FE2 /* MainSidebarTableCellView.hpp */,
 				4FE08D432B5511B9003D9FE2 /* MainSidebarTableCellView.mm */,
 				4FE08D452B5511C3003D9FE2 /* MainSidebarTableCellView.xib */,
 			);
@@ -205,6 +210,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FE64ABD2B58203700558BCC /* MainSidebarItemModel.mm in Sources */,
 				4FE08D332B54FB2E003D9FE2 /* MainSidebarViewController.mm in Sources */,
 				4FE08D442B5511B9003D9FE2 /* MainSidebarTableCellView.mm in Sources */,
 				4FE08D1A2B54EB1C003D9FE2 /* main.mm in Sources */,

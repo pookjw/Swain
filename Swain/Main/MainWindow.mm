@@ -60,7 +60,7 @@ __attribute__((objc_direct_members))
     self.contentViewController = splitViewController;
     
     [splitViewController addSplitViewItem:self.sidebarSplitViewItem];
-    [splitViewController addSplitViewItem:self.contentListSplitViewItem];
+//    [splitViewController addSplitViewItem:self.contentListSplitViewItem];
 }
 
 - (NSSplitViewController *)splitViewController {
@@ -77,8 +77,8 @@ __attribute__((objc_direct_members))
     
     NSSplitViewItem *sidebarSplitViewItem = [NSSplitViewItem sidebarWithViewController:self.mainSidebarViewController];
     sidebarSplitViewItem.canCollapse = NO;
-    reinterpret_cast<void (*)(id, SEL, CGFloat)>(objc_msgSend)(sidebarSplitViewItem, sel_registerName("setMinimumSize:"), 200.f);
-    reinterpret_cast<void (*)(id, SEL, CGFloat)>(objc_msgSend)(sidebarSplitViewItem, sel_registerName("setMaximumSize:"), 200.f);
+    reinterpret_cast<void (*)(id, SEL, CGFloat)>(objc_msgSend)(sidebarSplitViewItem, sel_registerName("setMinimumSize:"), 250.f);
+    reinterpret_cast<void (*)(id, SEL, CGFloat)>(objc_msgSend)(sidebarSplitViewItem, sel_registerName("setMaximumSize:"), 250.f);
     
     _sidebarSplitViewItem = [sidebarSplitViewItem retain];
     return sidebarSplitViewItem;
