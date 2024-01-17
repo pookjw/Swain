@@ -2,22 +2,23 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
-        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <tableCellView identifier="NSTableViewRowViewKey" id="laR-yR-l90" customClass="MainSidebarTableRowView">
+        <tableCellView identifier="Test" id="laR-yR-l90" customClass="MainSidebarTableCellView">
             <rect key="frame" x="0.0" y="0.0" width="220" height="36"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" id="qZ5-YK-fIS">
-                    <rect key="frame" x="17" y="8" width="20" height="20"/>
+                    <rect key="frame" x="17" y="8.5" width="20.5" height="19"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSActionTemplate" id="H5M-Mh-sZ9"/>
-                    <color key="contentTintColor" name="AccentColor"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="H5M-Mh-sZ9">
+                        <imageReference key="image" image="NSLockLockedTemplate" symbolScale="default"/>
+                    </imageCell>
                 </imageView>
                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6fP-Rc-nkO">
                     <rect key="frame" x="40" y="8" width="195" height="20"/>
@@ -25,7 +26,7 @@
                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="CEN-8k-DES">
                         <font key="font" metaFont="system" size="15"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
             </subviews>
@@ -37,9 +38,6 @@
         </tableCellView>
     </objects>
     <resources>
-        <image name="NSActionTemplate" width="20" height="20"/>
-        <namedColor name="AccentColor">
-            <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
+        <image name="NSLockLockedTemplate" width="19" height="19"/>
     </resources>
 </document>

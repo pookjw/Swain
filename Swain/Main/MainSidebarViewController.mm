@@ -6,10 +6,10 @@
 //
 
 #import "MainSidebarViewController.hpp"
-#import "MainSidebarTableRowView.h"
+#import "MainSidebarTableCellView.h"
 
 __attribute__((objc_direct_members))
-@interface MainSidebarViewController () <NSTableViewDataSource, NSTableViewDelegate> {
+@interface MainSidebarViewController () <NSTableViewDelegate, NSTableViewDataSource> {
     NSTableView *_tableView;
 }
 @property (retain, nonatomic, readonly) NSTableView *tableView;
@@ -30,6 +30,21 @@ __attribute__((objc_direct_members))
     [super viewDidLoad];
 }
 
+//- (NSOutlineView *)outlineView {
+//    if (auto outlineView = _outlineView) return outlineView;
+//    
+//    NSOutlineView *outlineView = [NSOutlineView new];
+//    outlineView.dataSource = self;
+//    outlineView.delegate = self;
+//    
+//    NSNib *nib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(MainSidebarTableRowView.class) bundle:[NSBundle bundleForClass:MainSidebarTableRowView.class]];
+//    [outlineView registerNib:nib forIdentifier:NSTableViewRowViewKey];
+//    [nib release];
+//    
+//    _outlineView = [outlineView retain];
+//    return [outlineView autorelease];
+//}
+
 - (NSTableView *)tableView {
     if (auto tableView = _tableView) return tableView;
     
@@ -39,13 +54,15 @@ __attribute__((objc_direct_members))
     tableView.style = NSTableViewStyleSourceList;
     tableView.usesAutomaticRowHeights = NO;
     
-    NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:@"Test"];
-    tableColumn.title = @"Test";
-    [tableView addTableColumn:tableColumn];
-    [tableColumn release];
+//    tableView.headerView = nil;
+//    
+//    NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:@"Test"];
+//    tableColumn.title = @"Test";
+//    [tableView addTableColumn:tableColumn];
+//    [tableColumn release];
     
-    NSNib *nib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(MainSidebarTableRowView.class) bundle:[NSBundle bundleForClass:MainSidebarTableRowView.class]];
-    [tableView registerNib:nib forIdentifier:NSTableViewRowViewKey];
+    NSNib *nib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(MainSidebarTableCellView.class) bundle:[NSBundle bundleForClass:MainSidebarTableCellView.class]];
+    [tableView registerNib:nib forIdentifier:@"Test"];
     [nib release];
     
     _tableView = [tableView retain];
@@ -59,16 +76,17 @@ __attribute__((objc_direct_members))
     return 3;
 }
 
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    return nil;
+}
+
 
 #pragma mark - NSTableViewDelegate
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    return nil;
-}
-
-- (NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row {
-    NSTableRowView *rowView = [tableView makeViewWithIdentifier:NSTableViewRowViewKey owner:self];
-    return [rowView autorelease];
+    MainSidebarTableCellView *view = [tableView makeViewWithIdentifier:@"Test" owner:nil];
+    
+    return view;
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
