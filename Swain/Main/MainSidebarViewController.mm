@@ -9,16 +9,6 @@
 #import "MainSidebarTableCellView.hpp"
 #import "MainSidebarItemModel.hpp"
 
-@interface Row : NSTableRowView
-@end
-@implementation Row
-- (BOOL)isEmphasized { return NO; }
-
-- (void)setEmphasized:(BOOL)emphasized {
-    [super setEmphasized:emphasized];
-}
-@end
-
 namespace MainSidebar {
     NSUserInterfaceItemIdentifier const cellViewIdentifier = @"MainSidebarTableCellViewIdentifier";
 }
@@ -54,10 +44,10 @@ __attribute__((objc_direct_members))
     tableView.usesAutomaticRowHeights = NO;
     tableView.selectionHighlightStyle = NSTableViewSelectionHighlightStyleRegular;
     
-//    NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString string]];
-//    [tableView addTableColumn:tableColumn];
-//    [tableColumn release];
-//    
+    NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString string]];
+    [tableView addTableColumn:tableColumn];
+    [tableColumn release];
+    
     NSNib *nib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(MainSidebarTableCellView.class) bundle:[NSBundle bundleForClass:MainSidebarTableCellView.class]];
     [tableView registerNib:nib forIdentifier:MainSidebar::cellViewIdentifier];
     [nib release];
@@ -84,13 +74,8 @@ __attribute__((objc_direct_members))
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-//    MainSidebarTableCellView *view = [tableView makeViewWithIdentifier:MainSidebar::cellViewIdentifier owner:nil];
-//    return view;
-    return nil;
-}
-
-- (NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row {
-    return [[Row new] autorelease];
+    MainSidebarTableCellView *view = [tableView makeViewWithIdentifier:MainSidebar::cellViewIdentifier owner:nil];
+    return view;
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {

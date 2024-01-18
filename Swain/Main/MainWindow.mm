@@ -60,7 +60,7 @@ __attribute__((objc_direct_members))
     self.contentViewController = splitViewController;
     
     [splitViewController addSplitViewItem:self.sidebarSplitViewItem];
-//    [splitViewController addSplitViewItem:self.contentListSplitViewItem];
+    [splitViewController addSplitViewItem:self.contentListSplitViewItem];
 }
 
 - (NSSplitViewController *)splitViewController {
