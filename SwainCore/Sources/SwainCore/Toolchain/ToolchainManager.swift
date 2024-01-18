@@ -15,46 +15,64 @@ import HandyMacros
 public actor ToolchainManager: NSObject {
     @objc(sharedInstance) public static let shared: ToolchainManager = .init()
     
-    public var managedObjectContext: NSManagedObjectContext! {
-        guard let modelContext: ModelContext else { return nil }
-        
-        return Mirror(reflecting: modelContext)
-            .descendant("_nsContext") as? NSManagedObjectContext
+    public var modelContext: ModelContext {
+        get async throws {
+            if let _modelContext: ModelContext {
+                return _modelContext
+            }
+            
+            let modelContext: ModelContext = try await modelContainer.mainContext
+            _modelContext = modelContext
+            
+            return modelContext
+        }
     }
     
-    public private(set) var modelContext: ModelContext!
-    private var modelContainer: ModelContainer!
+    public var modelContainer: ModelContainer {
+        get async throws {
+            if let _modelContainer: ModelContainer {
+                return _modelContainer
+            }
+            
+            let url: URL = .applicationSupportDirectory
+                .appending(path: "SwainCore", directoryHint: .isDirectory)
+                .appending(component: "Toolchain", directoryHint: .notDirectory)
+                .appendingPathExtension("sqlite")
+            
+            let configuration: ModelConfiguration = .init(
+                "Toolchain",
+                url: url
+            )
+            
+            print(configuration.url)
+            
+            let modelContainer: ModelContainer = try .init(for: Toolchain.self, configurations: configuration)
+            
+            _modelContainer = modelContainer
+            
+            return modelContainer
+        }
+    }
+    
+    private var _modelContext: ModelContext?
+    private var _modelContainer: ModelContainer?
     
     private override init() {
         super.init()
     }
     
-    @objc
-    public func configure() async throws {
-        guard modelContext == nil else { return }
+    @objc public func managedObjectContext() async throws -> NSManagedObjectContext! {
+        let modelContext: ModelContext = try await modelContext
         
-        let url: URL = .applicationSupportDirectory
-            .appending(component: "Toolchain", directoryHint: .notDirectory)
-            .appendingPathExtension("sqlite")
-        
-        let configuration: ModelConfiguration = .init(
-            "Toolchain",
-            url: url
-        )
-        
-        print(configuration.url)
-        
-        let modelContainer: ModelContainer = try .init(for: Toolchain.self, configurations: configuration)
-        
-        self.modelContainer = modelContainer
-        self.modelContext = await modelContainer.mainContext
+        return Mirror(reflecting: modelContext)
+            .descendant("_nsContext") as? NSManagedObjectContext
     }
     
     @AddObjCCompletionHandler
     public nonisolated func reloadToolchains() async throws {
         let refs: [GitHub.Ref] = try await GitHub.swiftRefs()
         try Task.checkCancellation()
-        let modelContext: ModelContext = await modelContext
+        let modelContext: ModelContext = try await modelContext
         
         try await MainActor.run {
             try modelContext.delete(model: Toolchain.self)
@@ -72,7 +90,7 @@ public actor ToolchainManager: NSObject {
     }
     
     @_spi(SwainCoreTests) public func destory() async throws {
-        guard let modelContainer: ModelContainer else { return }
+        let modelContainer: ModelContainer = try await modelContainer
         
         modelContainer.deleteAllData()
         
@@ -85,7 +103,7 @@ public actor ToolchainManager: NSObject {
             try FileManager.default.removeItem(at: url.deletingLastPathComponent().appending(component: "\(lastPathComponent)-wal"))
         }
         
-        self.modelContext = nil
-        self.modelContainer = nil
+        _modelContext = nil
+        _modelContainer = nil
     }
 }

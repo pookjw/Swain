@@ -15,14 +15,14 @@ public final class Toolchain: Hashable, Sendable {
         case stable, release, main
     }
     
-    public var category: Category {
-        @storageRestrictions(accesses: _$backingData, initializes: __category)
+    public var categoryType: Category {
+        @storageRestrictions(accesses: _$backingData, initializes: _category)
         init(initialValue) {
-            _$backingData.setValue(forKey: \._category, to: initialValue.rawValue)
-            __category = _SwiftDataNoType()
+            _$backingData.setValue(forKey: \.category, to: initialValue.rawValue)
+            _category = _SwiftDataNoType()
         }
         get {
-            .init(rawValue: _category)!
+            .init(rawValue: category)!
         }
 //        set {
 //            _category = newValue.rawValue
@@ -37,7 +37,7 @@ public final class Toolchain: Hashable, Sendable {
          https://download.swift.org/swift-5.10-branch/xcode/swift-5.10-DEVELOPMENT-SNAPSHOT-2024-01-11-a/swift-5.10-DEVELOPMENT-SNAPSHOT-2024-01-11-a-osx.pkg
          https://download.swift.org/development/xcode/swift-DEVELOPMENT-SNAPSHOT-2024-01-11-a/swift-DEVELOPMENT-SNAPSHOT-2024-01-11-a-osx.pkg
          */
-        switch category {
+        switch categoryType {
         case .stable:
             let regex: Regex = .init {
                 "swift-"
@@ -87,8 +87,8 @@ public final class Toolchain: Hashable, Sendable {
         }
     }
     
-    @Attribute(.unique, originalName: "name") public let name: String
-    @Attribute(originalName: "category") public let _category: String
+    @Attribute(.unique) public let name: String
+    @Attribute() let category: String
     
     init?(refName: String) {
         guard let name: String = Self.getTagName(refName: refName) else {
@@ -96,11 +96,11 @@ public final class Toolchain: Hashable, Sendable {
         }
         
         if name.contains(Self.stableRegex) {
-            self.category = .stable
+            self.categoryType = .stable
         } else if name.contains(Self.releaseRegex) {
-            self.category = .release
+            self.categoryType = .release
         } else if name.contains(Self.mainRegex) {
-            self.category = .main
+            self.categoryType = .main
         } else {
             return nil
         }

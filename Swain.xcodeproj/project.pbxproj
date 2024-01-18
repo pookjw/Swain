@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4F68265C2B59692B0063018F /* ToolchainsViewModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */; };
 		4FE08D102B54EB1B003D9FE2 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */; };
 		4FE08D152B54EB1C003D9FE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4FE08D142B54EB1C003D9FE2 /* Assets.xcassets */; };
 		4FE08D1A2B54EB1C003D9FE2 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D192B54EB1C003D9FE2 /* main.mm */; };
@@ -25,6 +26,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4F68265A2B59692B0063018F /* ToolchainsViewModel.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsViewModel.hpp; sourceTree = "<group>"; };
+		4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsViewModel.mm; sourceTree = "<group>"; };
+		4F6826632B596C0F0063018F /* SWCToolchainManager+Category.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "SWCToolchainManager+Category.hpp"; sourceTree = "<group>"; };
 		4FE08D0B2B54EB1B003D9FE2 /* Swain.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Swain.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AppDelegate.hpp; sourceTree = "<group>"; };
 		4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
@@ -88,6 +92,7 @@
 			children = (
 				4FE08D342B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.h */,
 				4FE08D352B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm */,
+				4F6826632B596C0F0063018F /* SWCToolchainManager+Category.hpp */,
 				4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.hpp */,
 				4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */,
 				4FE08D2D2B54F842003D9FE2 /* Main */,
@@ -131,6 +136,8 @@
 			children = (
 				4FE08D382B54FE80003D9FE2 /* ToolchainsViewController.hpp */,
 				4FE08D392B54FE80003D9FE2 /* ToolchainsViewController.mm */,
+				4F68265A2B59692B0063018F /* ToolchainsViewModel.hpp */,
+				4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */,
 			);
 			path = Toolchains;
 			sourceTree = "<group>";
@@ -212,6 +219,7 @@
 			files = (
 				4FE64ABD2B58203700558BCC /* MainSidebarItemModel.mm in Sources */,
 				4FE08D332B54FB2E003D9FE2 /* MainSidebarViewController.mm in Sources */,
+				4F68265C2B59692B0063018F /* ToolchainsViewModel.mm in Sources */,
 				4FE08D442B5511B9003D9FE2 /* MainSidebarTableCellView.mm in Sources */,
 				4FE08D1A2B54EB1C003D9FE2 /* main.mm in Sources */,
 				4FE08D362B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm in Sources */,
