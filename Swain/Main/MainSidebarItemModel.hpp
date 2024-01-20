@@ -21,6 +21,7 @@ __attribute__((objc_direct_members))
 @property (readonly, nonatomic) NSImage *image;
 @property (readonly, nonatomic) NSImage *selectedImage;
 @property (readonly, nonatomic) NSString *title;
+@property (readonly, nonatomic) NSString * _Nullable toolchainCategory;
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithType:(MainSidebarItemModelType)type NS_DESIGNATED_INITIALIZER;

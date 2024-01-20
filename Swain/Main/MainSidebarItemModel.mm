@@ -6,6 +6,7 @@
 //
 
 #import "MainSidebarItemModel.hpp"
+@import SwainCore;
 
 __attribute__((objc_direct_members))
 @interface MainSidebarItemModel ()
@@ -77,6 +78,19 @@ __attribute__((objc_direct_members))
             return @"Trunk Development";
         default:
             return @"(null)";
+    }
+}
+
+- (NSString *)toolchainCategory {
+    switch (_type) {
+        case MainSidebarItemModelTypeStable:
+            return SWCToolchainCategoryStableName();
+        case MainSidebarItemModelTypeRelease:
+            return SWCToolchainCategoryReleaseName();
+        case MainSidebarItemModelTypeMain:
+            return SWCToolchainCategoryMainName();
+        default:
+            return nil;
     }
 }
 

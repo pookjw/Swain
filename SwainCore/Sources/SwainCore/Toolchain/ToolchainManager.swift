@@ -77,12 +77,22 @@ public actor ToolchainManager: NSObject {
         try await MainActor.run {
             try modelContext.delete(model: Toolchain.self)
             
-            for ref in refs {
+            try modelContext.save()
+            
+            let f = FetchDescriptor<Toolchain>.init()
+            let count = try modelContext.fetchCount(f)
+            print(count)
+            
+            for (index, ref) in refs.enumerated() {
                 guard let toolchain: Toolchain = .init(refName: ref.ref) else {
                     continue
                 }
                 
                 modelContext.insert(toolchain)
+                
+                if index > .zero, index % 500 == .zero {
+                    try modelContext.save()
+                }
             }
             
             try modelContext.save()

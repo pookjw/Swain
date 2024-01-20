@@ -7,13 +7,15 @@
 
 #import "ToolchainsViewController.hpp"
 #import "ToolchainsViewModel.hpp"
+#import "ToolchainsCollectionViewItem.hpp"
 
 __attribute__((objc_direct_members))
-@interface ToolchainsViewController () {
+@interface ToolchainsViewController () <NSCollectionViewDelegate> {
     NSScrollView *_scrollView;
     NSCollectionView *_collectionView;
     ToolchainsViewModel *_viewModel;
 }
+@property (copy, nonatomic, readonly) NSString *toolchainCategory;
 @property (retain, nonatomic, readonly) NSScrollView *scrollView;
 @property (retain, nonatomic, readonly) NSCollectionView *collectionView;
 @property (retain, nonatomic, readonly) ToolchainsViewModel *viewModel;
@@ -21,7 +23,16 @@ __attribute__((objc_direct_members))
 
 @implementation ToolchainsViewController
 
+- (instancetype)initWithToolchainCategory:(NSString *)toolchainCategory {
+    if (self = [super initWithNibName:nil bundle:nil]) {
+        _toolchainCategory = [toolchainCategory copy];
+    }
+    
+    return self;
+}
+
 - (void)dealloc {
+    [_toolchainCategory release];
     [_scrollView release];
     [_collectionView release];
     [_viewModel release];
@@ -35,8 +46,12 @@ __attribute__((objc_direct_members))
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self.viewModel loadDataSourceWithCompletionHandler:^(NSError * _Nullable error) {
+    [self.viewModel loadDataSourceWithToolchainCategory:_toolchainCategory completionHandler:^(NSError * _Nullable error) {
         assert(!error);
+//        [self.viewModel reloadDataSourceWithCompletionHandler:^(NSError * _Nullable error) {
+//            NSLog(@"Done!");
+//            assert(!error);
+//        }];
     }];
 }
 
@@ -56,8 +71,20 @@ __attribute__((objc_direct_members))
     NSCollectionViewCompositionalLayoutConfiguration *configuration = [NSCollectionViewCompositionalLayoutConfiguration new];
     configuration.scrollDirection = NSCollectionViewScrollDirectionVertical;
     
-    NSCollectionViewCompositionalLayout *collectionViewLayout = [[NSCollectionViewCompositionalLayout alloc] initWithSectionProvider:^NSCollectionLayoutSection * _Nullable(NSInteger section, id<NSCollectionLayoutEnvironment> _Nonnull) {
-        return nil;
+    NSCollectionViewCompositionalLayout *collectionViewLayout = [[NSCollectionViewCompositionalLayout alloc] initWithSectionProvider:^NSCollectionLayoutSection * _Nullable(NSInteger sectionIdx, id<NSCollectionLayoutEnvironment> _Nonnull) {
+        auto itemSize = [NSCollectionLayoutSize sizeWithWidthDimension:[NSCollectionLayoutDimension fractionalWidthDimension:1.f]
+                                                       heightDimension:[NSCollectionLayoutDimension estimatedDimension:44.f]];
+        
+        auto item = [NSCollectionLayoutItem itemWithLayoutSize:itemSize supplementaryItems:@[]];
+        
+        auto groupSize = [NSCollectionLayoutSize sizeWithWidthDimension:[NSCollectionLayoutDimension fractionalWidthDimension:1.f]
+                                                        heightDimension:[NSCollectionLayoutDimension estimatedDimension:44.f]];
+        
+        auto group = [NSCollectionLayoutGroup verticalGroupWithLayoutSize:groupSize subitems:@[item]];
+        
+        auto section = [NSCollectionLayoutSection sectionWithGroup:group];
+        
+        return section;
     } 
                                                                                                                        configuration:configuration];
     
@@ -65,7 +92,10 @@ __attribute__((objc_direct_members))
     
     NSCollectionView *collectionView = [NSCollectionView new];
     collectionView.collectionViewLayout = collectionViewLayout;
+    collectionView.delegate = self;
     [collectionViewLayout release];
+    
+    [collectionView registerClass:ToolchainsCollectionViewItem.class forItemWithIdentifier:ToolchainsCollectionViewItem.identifier];
     
     _collectionView = [collectionView retain];
     return [collectionView autorelease];
@@ -81,8 +111,16 @@ __attribute__((objc_direct_members))
 }
 
 - (NSCollectionViewDiffableDataSource<NSString *, NSManagedObjectID *> *)makeDataSource __attribute__((objc_direct)) {
-    auto dataSource = [[NSCollectionViewDiffableDataSource<NSString *, NSManagedObjectID *> alloc] initWithCollectionView:self.collectionView itemProvider:^NSCollectionViewItem * _Nullable(NSCollectionView * _Nonnull, NSIndexPath * _Nonnull, NSManagedObjectID * _Nonnull) {
-        return nil;
+    __weak decltype(self) weakSelf = self;
+    
+    auto dataSource = [[NSCollectionViewDiffableDataSource<NSString *, NSManagedObjectID *> alloc] initWithCollectionView:self.collectionView itemProvider:^NSCollectionViewItem * _Nullable(NSCollectionView * _Nonnull collectionView, NSIndexPath * _Nonnull indexPath, NSManagedObjectID * _Nonnull managedObjectID) {
+        auto item = reinterpret_cast<ToolchainsCollectionViewItem *>([collectionView makeItemWithIdentifier:ToolchainsCollectionViewItem.identifier forIndexPath:indexPath]);
+        
+        if (auto managedObjectContext = weakSelf.viewModel.childManagedObjectContext) {
+            [item loadWithManagedObjectContext:managedObjectContext managedObjectID:managedObjectID];
+        }
+        
+        return item;
     }];
     
     return [dataSource autorelease];

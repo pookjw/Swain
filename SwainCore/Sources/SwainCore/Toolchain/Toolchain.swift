@@ -9,6 +9,18 @@ import Foundation
 import SwiftData
 import RegexBuilder
 
+@_cdecl("SWCToolchainCategoryStableName") public func SWCToolchainCategoryStableName() -> String {
+    Toolchain.Category.stable.rawValue
+}
+
+@_cdecl("SWCToolchainCategoryReleaseName") public func SWCToolchainCategoryReleaseName() -> String {
+    Toolchain.Category.release.rawValue
+}
+
+@_cdecl("SWCToolchainCategoryMainName") public func SWCToolchainCategoryMainName() -> String {
+    Toolchain.Category.main.rawValue
+}
+
 @Model
 public final class Toolchain: Hashable, Sendable {
     public enum Category: String, Hashable, Sendable {

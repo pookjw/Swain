@@ -24,7 +24,7 @@ extension GitHub {
         request.method = .GET
         request.headers = [
             "Accept": "application/vnd.github+json",
-            "Authorization": "5a4d690ae4c3ca0616d131da2f807e49aec1f615",
+            "Authorization": "Basic YjU4YWM1N2NjMjIzNDIzOThhOWQwMWNjOGYwZjhlNWI6em5aME9zN3ozNDZ6Q3F3V0ZwNWcxcVJoaG5YUGIzT2Q=",
             "User-Agent": "PostmanRuntime/7.30.0"
         ]
         

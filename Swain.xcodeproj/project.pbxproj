@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		4F68265C2B59692B0063018F /* ToolchainsViewModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */; };
+		4F6826662B5A16080063018F /* ToolchainsCollectionViewItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F6826652B5A16080063018F /* ToolchainsCollectionViewItem.mm */; };
+		4F9161B42B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F9161B32B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.mm */; };
+		4F9162072B5BF4170068AE1F /* MainSidebarTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F9162062B5BF4170068AE1F /* MainSidebarTableView.mm */; };
 		4FE08D102B54EB1B003D9FE2 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */; };
 		4FE08D152B54EB1C003D9FE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4FE08D142B54EB1C003D9FE2 /* Assets.xcassets */; };
 		4FE08D1A2B54EB1C003D9FE2 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D192B54EB1C003D9FE2 /* main.mm */; };
@@ -29,6 +32,12 @@
 		4F68265A2B59692B0063018F /* ToolchainsViewModel.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsViewModel.hpp; sourceTree = "<group>"; };
 		4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsViewModel.mm; sourceTree = "<group>"; };
 		4F6826632B596C0F0063018F /* SWCToolchainManager+Category.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "SWCToolchainManager+Category.hpp"; sourceTree = "<group>"; };
+		4F6826642B5A16080063018F /* ToolchainsCollectionViewItem.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsCollectionViewItem.hpp; sourceTree = "<group>"; };
+		4F6826652B5A16080063018F /* ToolchainsCollectionViewItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsCollectionViewItem.mm; sourceTree = "<group>"; };
+		4F9161B22B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "NSTextField+ApplyLabelStyle.hpp"; sourceTree = "<group>"; };
+		4F9161B32B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSTextField+ApplyLabelStyle.mm"; sourceTree = "<group>"; };
+		4F9162052B5BF4170068AE1F /* MainSidebarTableView.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainSidebarTableView.hpp; sourceTree = "<group>"; };
+		4F9162062B5BF4170068AE1F /* MainSidebarTableView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainSidebarTableView.mm; sourceTree = "<group>"; };
 		4FE08D0B2B54EB1B003D9FE2 /* Swain.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Swain.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AppDelegate.hpp; sourceTree = "<group>"; };
 		4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
@@ -70,6 +79,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4F9161B12B5BC0120068AE1F /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				4FE08D342B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.h */,
+				4FE08D352B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm */,
+				4F6826632B596C0F0063018F /* SWCToolchainManager+Category.hpp */,
+				4F9161B22B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.hpp */,
+				4F9161B32B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.mm */,
+			);
+			path = Category;
+			sourceTree = "<group>";
+		};
 		4FE08D022B54EB1B003D9FE2 = {
 			isa = PBXGroup;
 			children = (
@@ -90,11 +111,9 @@
 		4FE08D0D2B54EB1B003D9FE2 /* Swain */ = {
 			isa = PBXGroup;
 			children = (
-				4FE08D342B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.h */,
-				4FE08D352B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm */,
-				4F6826632B596C0F0063018F /* SWCToolchainManager+Category.hpp */,
 				4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.hpp */,
 				4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */,
+				4F9161B12B5BC0120068AE1F /* Category */,
 				4FE08D2D2B54F842003D9FE2 /* Main */,
 				4FE08D372B54FE72003D9FE2 /* Toolchains */,
 				4FE08D142B54EB1C003D9FE2 /* Assets.xcassets */,
@@ -122,6 +141,8 @@
 				4FE08D2F2B54F8AB003D9FE2 /* MainWindow.mm */,
 				4FE08D312B54FB2E003D9FE2 /* MainSidebarViewController.hpp */,
 				4FE08D322B54FB2E003D9FE2 /* MainSidebarViewController.mm */,
+				4F9162052B5BF4170068AE1F /* MainSidebarTableView.hpp */,
+				4F9162062B5BF4170068AE1F /* MainSidebarTableView.mm */,
 				4FE64ABB2B58203700558BCC /* MainSidebarItemModel.hpp */,
 				4FE64ABC2B58203700558BCC /* MainSidebarItemModel.mm */,
 				4FE08D422B5511B9003D9FE2 /* MainSidebarTableCellView.hpp */,
@@ -138,6 +159,8 @@
 				4FE08D392B54FE80003D9FE2 /* ToolchainsViewController.mm */,
 				4F68265A2B59692B0063018F /* ToolchainsViewModel.hpp */,
 				4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */,
+				4F6826642B5A16080063018F /* ToolchainsCollectionViewItem.hpp */,
+				4F6826652B5A16080063018F /* ToolchainsCollectionViewItem.mm */,
 			);
 			path = Toolchains;
 			sourceTree = "<group>";
@@ -222,10 +245,13 @@
 				4F68265C2B59692B0063018F /* ToolchainsViewModel.mm in Sources */,
 				4FE08D442B5511B9003D9FE2 /* MainSidebarTableCellView.mm in Sources */,
 				4FE08D1A2B54EB1C003D9FE2 /* main.mm in Sources */,
+				4F6826662B5A16080063018F /* ToolchainsCollectionViewItem.mm in Sources */,
 				4FE08D362B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm in Sources */,
+				4F9161B42B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.mm in Sources */,
 				4FE08D102B54EB1B003D9FE2 /* AppDelegate.mm in Sources */,
 				4FE08D3A2B54FE80003D9FE2 /* ToolchainsViewController.mm in Sources */,
 				4FE08D302B54F8AB003D9FE2 /* MainWindow.mm in Sources */,
+				4F9162072B5BF4170068AE1F /* MainSidebarTableView.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

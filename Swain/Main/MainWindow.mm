@@ -9,20 +9,28 @@
 #import "MainSidebarViewController.hpp"
 #import "ToolchainsViewController.hpp"
 #import <objc/message.h>
+@import SwainCore;
+
+namespace ns_MainWindow {
+    const NSToolbarIdentifier toolbarIdentifier = @"MainWindowToolbarIdentifier";
+}
 
 __attribute__((objc_direct_members))
-@interface MainWindow () {
+@interface MainWindow () <MainSidebarViewControllerDelegate> {
     NSSplitViewController *_splitViewController;
-    NSSplitViewItem *_contentListSplitViewItem;
     NSSplitViewItem *_sidebarSplitViewItem;
     MainSidebarViewController *_mainSidebarViewController;
-    ToolchainsViewController *_toolchainsViewController;
+    ToolchainsViewController *_stableToolchainsViewController;
+    ToolchainsViewController *_releaseToolchainsViewController;
+    ToolchainsViewController *_mainToolchainsViewController;
 }
 @property (retain, nonatomic, readonly) NSSplitViewController *splitViewController;
 @property (retain, nonatomic, readonly) NSSplitViewItem *sidebarSplitViewItem;
-@property (retain, nonatomic, readonly) NSSplitViewItem *contentListSplitViewItem;
-@property (retain, nonatomic, readonly) ToolchainsViewController *toolchainsViewController;
+@property (retain, nonatomic) NSSplitViewItem * _Nullable contentListSplitViewItem;
 @property (retain, nonatomic, readonly) MainSidebarViewController *mainSidebarViewController;
+@property (retain, nonatomic, readonly) ToolchainsViewController *mainToolchainsViewController;
+@property (retain, nonatomic, readonly) ToolchainsViewController *stableToolchainsViewController;
+@property (retain, nonatomic, readonly) ToolchainsViewController *releaseToolchainsViewController;
 @end
 
 @implementation MainWindow
@@ -49,18 +57,25 @@ __attribute__((objc_direct_members))
     [_sidebarSplitViewItem release];
     [_contentListSplitViewItem release];
     [_mainSidebarViewController release];
-    [_toolchainsViewController release];
+    [_stableToolchainsViewController release];
+    [_releaseToolchainsViewController release];
+    [_mainToolchainsViewController release];
     [super dealloc];
 }
 
 - (void)commonInit_MainWindow __attribute__((objc_direct)) {
+    self.title = @"Swain";
     self.movableByWindowBackground = YES;
+    self.contentMinSize = CGSizeMake(600.f, 400.f);
     
     NSSplitViewController *splitViewController = self.splitViewController;
     self.contentViewController = splitViewController;
     
     [splitViewController addSplitViewItem:self.sidebarSplitViewItem];
-    [splitViewController addSplitViewItem:self.contentListSplitViewItem];
+    
+    NSViewController *emptyViewController = [NSViewController new];
+    [self replaceContentViewController:emptyViewController];
+    [emptyViewController release];
 }
 
 - (NSSplitViewController *)splitViewController {
@@ -84,32 +99,62 @@ __attribute__((objc_direct_members))
     return sidebarSplitViewItem;
 }
 
-- (NSSplitViewItem *)contentListSplitViewItem {
-    if (auto contentListSplitViewItem = _contentListSplitViewItem) return contentListSplitViewItem;
-    
-    NSSplitViewItem *contentListSplitViewItem = [NSSplitViewItem contentListWithViewController:self.toolchainsViewController];
-    contentListSplitViewItem.canCollapse = NO;
-    
-    _contentListSplitViewItem = [contentListSplitViewItem retain];
-    return contentListSplitViewItem;
-}
-
 - (MainSidebarViewController *)mainSidebarViewController {
     if (auto mainSidebarViewController = _mainSidebarViewController) return mainSidebarViewController;
     
     MainSidebarViewController *mainSidebarViewController = [MainSidebarViewController new];
+    mainSidebarViewController.delegate = self;
     
     _mainSidebarViewController = [mainSidebarViewController retain];
     return [mainSidebarViewController autorelease];
 }
 
-- (ToolchainsViewController *)toolchainsViewController {
-    if (auto toolchainsViewController = _toolchainsViewController) return toolchainsViewController;
+- (ToolchainsViewController *)mainToolchainsViewController {
+    if (auto mainToolchainsViewController = _mainToolchainsViewController) return mainToolchainsViewController;
     
-    ToolchainsViewController *toolchainsViewController = [ToolchainsViewController new];
+    ToolchainsViewController *mainToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryMainName()];
     
-    _toolchainsViewController = [toolchainsViewController retain];
-    return [toolchainsViewController autorelease];
+    _mainToolchainsViewController = [mainToolchainsViewController retain];
+    return [mainToolchainsViewController autorelease];
+}
+
+- (ToolchainsViewController *)stableToolchainsViewController {
+    if (auto stableToolchainsViewController = _stableToolchainsViewController) return stableToolchainsViewController;
+    
+    ToolchainsViewController *stableToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryStableName()];
+    
+    _stableToolchainsViewController = [stableToolchainsViewController retain];
+    return [stableToolchainsViewController autorelease];
+}
+
+- (ToolchainsViewController *)releaseToolchainsViewController {
+    if (auto releaseToolchainsViewController = _releaseToolchainsViewController) return releaseToolchainsViewController;
+    
+    ToolchainsViewController *releaseToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryReleaseName()];
+    
+    _releaseToolchainsViewController = [releaseToolchainsViewController retain];
+    return [releaseToolchainsViewController autorelease];
+}
+
+- (void)mainSidebarViewController:(MainSidebarViewController *)mainSidebarViewController didSelectToolchainCategory:(NSString *)toolchainCategory {
+    if ([toolchainCategory isEqualToString:SWCToolchainCategoryMainName()]) {
+        [self replaceContentViewController:self.mainToolchainsViewController];
+    } else if ([toolchainCategory isEqualToString:SWCToolchainCategoryStableName()]) {
+        [self replaceContentViewController:self.stableToolchainsViewController];
+    } else if ([toolchainCategory isEqualToString:SWCToolchainCategoryReleaseName()]) {
+        [self replaceContentViewController:self.releaseToolchainsViewController];
+    }
+}
+
+- (void)replaceContentViewController:(NSViewController *)contentViewController __attribute__((objc_direct)) {
+    if (auto contentListSplitViewItem = self.contentListSplitViewItem) {
+        [self.splitViewController removeSplitViewItem:contentListSplitViewItem];
+        self.contentListSplitViewItem = nil;
+    }
+    
+    NSSplitViewItem *contentListSplitViewItem = [NSSplitViewItem contentListWithViewController:contentViewController];
+    [self.splitViewController addSplitViewItem:contentListSplitViewItem];
+    self.contentListSplitViewItem = contentListSplitViewItem;
 }
 
 @end

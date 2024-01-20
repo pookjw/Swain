@@ -6,18 +6,21 @@
 //
 
 #import "MainSidebarViewController.hpp"
+#import "MainSidebarTableView.hpp"
 #import "MainSidebarTableCellView.hpp"
 #import "MainSidebarItemModel.hpp"
 
-namespace MainSidebar {
+namespace ns_MainSidebarViewController {
     NSUserInterfaceItemIdentifier const cellViewIdentifier = @"MainSidebarTableCellViewIdentifier";
 }
 
 __attribute__((objc_direct_members))
 @interface MainSidebarViewController () <NSTableViewDelegate, NSTableViewDataSource> {
-    NSTableView *_tableView;
+    NSScrollView *_scrollView;
+    MainSidebarTableView *_tableView;
 }
-@property (retain, nonatomic, readonly) NSTableView *tableView;
+@property (retain, nonatomic, readonly) NSScrollView *scrollView;
+@property (retain, nonatomic, readonly) MainSidebarTableView *tableView;
 @end
 
 @implementation MainSidebarViewController
@@ -28,28 +31,36 @@ __attribute__((objc_direct_members))
 }
 
 - (void)loadView {
-    self.view = self.tableView;
+    self.view = self.scrollView;
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
+- (NSScrollView *)scrollView {
+    if (auto scrollView = _scrollView) return scrollView;
+    
+    NSScrollView *scrollView = [NSScrollView new];
+    scrollView.documentView = self.tableView;
+    scrollView.drawsBackground = NO;
+    
+    _scrollView = [scrollView retain];
+    return [scrollView autorelease];
 }
 
-- (NSTableView *)tableView {
+- (MainSidebarTableView *)tableView {
     if (auto tableView = _tableView) return tableView;
-    NSTableView *tableView = [NSTableView new];
+    
+    MainSidebarTableView *tableView = [MainSidebarTableView new];
     tableView.dataSource = self;
     tableView.delegate = self;
     tableView.style = NSTableViewStyleSourceList;
     tableView.usesAutomaticRowHeights = NO;
     tableView.selectionHighlightStyle = NSTableViewSelectionHighlightStyleRegular;
-    
+
     NSTableColumn *tableColumn = [[NSTableColumn alloc] initWithIdentifier:[NSString string]];
     [tableView addTableColumn:tableColumn];
     [tableColumn release];
     
     NSNib *nib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(MainSidebarTableCellView.class) bundle:[NSBundle bundleForClass:MainSidebarTableCellView.class]];
-    [tableView registerNib:nib forIdentifier:MainSidebar::cellViewIdentifier];
+    [tableView registerNib:nib forIdentifier:ns_MainSidebarViewController::cellViewIdentifier];
     [nib release];
     
     _tableView = [tableView retain];
@@ -74,12 +85,34 @@ __attribute__((objc_direct_members))
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    MainSidebarTableCellView *view = [tableView makeViewWithIdentifier:MainSidebar::cellViewIdentifier owner:nil];
+    MainSidebarTableCellView *view = [tableView makeViewWithIdentifier:ns_MainSidebarViewController::cellViewIdentifier owner:nil];
     return view;
 }
 
 - (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
     return 36.f;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification {
+    auto delegate = self.delegate;
+    
+    if (delegate == nil) return;
+    
+    auto tableView = reinterpret_cast<MainSidebarTableView *>(notification.object);
+    
+    NSInteger selectedRow = tableView.selectedRow;
+    __kindof NSTableCellView * _Nullable selectedView = [tableView viewAtColumn:0 row:selectedRow makeIfNecessary:NO];
+    
+    if (selectedView == nil) return;
+    
+    MainSidebarItemModel * _Nullable objectValue = selectedView.objectValue;
+    
+    if (![objectValue isKindOfClass:MainSidebarItemModel.class]) return;
+    
+    NSString * _Nullable toolchainCategory = objectValue.toolchainCategory;
+    
+    if (toolchainCategory == nil) return;
+    [delegate mainSidebarViewController:self didSelectToolchainCategory:toolchainCategory];
 }
 
 @end
