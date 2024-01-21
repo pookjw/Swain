@@ -48,10 +48,6 @@ __attribute__((objc_direct_members))
     
     [self.viewModel loadDataSourceWithToolchainCategory:_toolchainCategory completionHandler:^(NSError * _Nullable error) {
         assert(!error);
-//        [self.viewModel reloadDataSourceWithCompletionHandler:^(NSError * _Nullable error) {
-//            NSLog(@"Done!");
-//            assert(!error);
-//        }];
     }];
 }
 

@@ -6,7 +6,6 @@
 //
 
 #import "ToolchainsViewModel.hpp"
-#import "SWCToolchainManager+Category.hpp"
 @import SwainCore;
 
 __attribute__((objc_direct_members))
@@ -105,10 +104,6 @@ __attribute__((objc_direct_members))
             [childManagedObjectContext release];
         }];
     });
-}
-
-- (NSProgress *)reloadDataSourceWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    return [SWCToolchainManager.sharedInstance reloadToolchainsWithCompletion:completionHandler];
 }
 
 - (void)contextDidMerge:(NSNotification *)notification {

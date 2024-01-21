@@ -8,36 +8,44 @@
 #import "MainWindow.hpp"
 #import "MainSidebarViewController.hpp"
 #import "ToolchainsViewController.hpp"
+#import "ToolchainInspectorViewController.hpp"
+#import "SWCToolchainManager+Category.hpp"
 #import <objc/message.h>
 @import SwainCore;
 
 namespace ns_MainWindow {
     const NSToolbarIdentifier toolbarIdentifier = @"MainWindowToolbarIdentifier";
+    const NSToolbarItemIdentifier reloadToolbarItemIdentifier = @"MainWindowReloadToolbarItemIdentifier";
+    const NSToolbarItemIdentifier searchToolbarItemIdentifier = @"MainWindowSearchToolbarItemIdentifier";
 }
 
 __attribute__((objc_direct_members))
-@interface MainWindow () <MainSidebarViewControllerDelegate> {
+@interface MainWindow () <NSToolbarDelegate, MainSidebarViewControllerDelegate> {
     NSSplitViewController *_splitViewController;
     NSSplitViewItem *_sidebarSplitViewItem;
     MainSidebarViewController *_mainSidebarViewController;
     ToolchainsViewController *_stableToolchainsViewController;
     ToolchainsViewController *_releaseToolchainsViewController;
     ToolchainsViewController *_mainToolchainsViewController;
+    ToolchainInspectorViewController *_toolchainInspectorViewController;
 }
 @property (retain, nonatomic, readonly) NSSplitViewController *splitViewController;
 @property (retain, nonatomic, readonly) NSSplitViewItem *sidebarSplitViewItem;
-@property (retain, nonatomic) NSSplitViewItem * _Nullable contentListSplitViewItem;
+@property (retain, nonatomic) NSSplitViewItem *contentListSplitViewItem;
+@property (retain, nonatomic) NSSplitViewItem * _Nullable inspectorSplitViewItem;
 @property (retain, nonatomic, readonly) MainSidebarViewController *mainSidebarViewController;
 @property (retain, nonatomic, readonly) ToolchainsViewController *mainToolchainsViewController;
 @property (retain, nonatomic, readonly) ToolchainsViewController *stableToolchainsViewController;
 @property (retain, nonatomic, readonly) ToolchainsViewController *releaseToolchainsViewController;
+@property (retain, nonatomic, readonly) ToolchainInspectorViewController *toolchainInspectorViewController;
+@property (retain, nonatomic) NSProgress * _Nullable reloadProgress;
 @end
 
 @implementation MainWindow
 
 - (instancetype)init {
     self = [self initWithContentRect:NSMakeRect(0.f, 0.f, 600.f, 400.f)
-                            styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable
+                            styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable | NSWindowStyleMaskTitled | NSWindowStyleMaskFullSizeContentView
                               backing:NSBackingStoreBuffered
                                 defer:YES];
     
@@ -56,10 +64,14 @@ __attribute__((objc_direct_members))
     [_splitViewController release];
     [_sidebarSplitViewItem release];
     [_contentListSplitViewItem release];
+    [_inspectorSplitViewItem release];
     [_mainSidebarViewController release];
     [_stableToolchainsViewController release];
     [_releaseToolchainsViewController release];
     [_mainToolchainsViewController release];
+    [_toolchainInspectorViewController release];
+    [_reloadProgress cancel];
+    [_reloadProgress release];
     [super dealloc];
 }
 
@@ -67,6 +79,8 @@ __attribute__((objc_direct_members))
     self.title = @"Swain";
     self.movableByWindowBackground = YES;
     self.contentMinSize = CGSizeMake(600.f, 400.f);
+    
+    //
     
     NSSplitViewController *splitViewController = self.splitViewController;
     self.contentViewController = splitViewController;
@@ -76,6 +90,16 @@ __attribute__((objc_direct_members))
     NSViewController *emptyViewController = [NSViewController new];
     [self replaceContentViewController:emptyViewController];
     [emptyViewController release];
+    
+    //
+    
+    NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:ns_MainWindow::toolbarIdentifier];
+    toolbar.delegate = self;
+    toolbar.allowsUserCustomization = NO;
+    toolbar.displayMode = NSToolbarDisplayModeIconOnly;
+    
+    self.toolbar = toolbar;
+    [toolbar release];
 }
 
 - (NSSplitViewController *)splitViewController {
@@ -136,6 +160,15 @@ __attribute__((objc_direct_members))
     return [releaseToolchainsViewController autorelease];
 }
 
+- (ToolchainInspectorViewController *)toolchainInspectorViewController {
+    if (auto toolchainInspectorViewController = _toolchainInspectorViewController) return toolchainInspectorViewController;
+    
+    ToolchainInspectorViewController *toolchainInspectorViewController = [ToolchainInspectorViewController new];
+    
+    _toolchainInspectorViewController = [toolchainInspectorViewController retain];
+    return [toolchainInspectorViewController autorelease];
+}
+
 - (void)mainSidebarViewController:(MainSidebarViewController *)mainSidebarViewController didSelectToolchainCategory:(NSString *)toolchainCategory {
     if ([toolchainCategory isEqualToString:SWCToolchainCategoryMainName()]) {
         [self replaceContentViewController:self.mainToolchainsViewController];
@@ -152,9 +185,91 @@ __attribute__((objc_direct_members))
         self.contentListSplitViewItem = nil;
     }
     
+    if (auto inspectorSplitViewItem = self.inspectorSplitViewItem) {
+        [self.splitViewController removeSplitViewItem:inspectorSplitViewItem];
+        self.inspectorSplitViewItem = nil;
+    }
+    
     NSSplitViewItem *contentListSplitViewItem = [NSSplitViewItem contentListWithViewController:contentViewController];
     [self.splitViewController addSplitViewItem:contentListSplitViewItem];
     self.contentListSplitViewItem = contentListSplitViewItem;
+    
+    if ([contentViewController isKindOfClass:ToolchainsViewController.class]) {
+        NSSplitViewItem *inspectorSplitViewItem = [NSSplitViewItem inspectorWithViewController:self.toolchainInspectorViewController];
+        self.inspectorSplitViewItem = inspectorSplitViewItem;
+        [self.splitViewController addSplitViewItem:inspectorSplitViewItem];
+    }
+}
+
+- (NSArray<NSToolbarItemIdentifier> *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar {
+    return @[
+        ns_MainWindow::reloadToolbarItemIdentifier,
+        ns_MainWindow::searchToolbarItemIdentifier,
+        NSToolbarInspectorTrackingSeparatorItemIdentifier,
+        NSToolbarFlexibleSpaceItemIdentifier,
+        NSToolbarToggleInspectorItemIdentifier
+    ];
+}
+
+- (NSArray<NSToolbarItemIdentifier> *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar {
+    return [self toolbarAllowedItemIdentifiers:toolbar];
+}
+
+- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSToolbarItemIdentifier)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag {
+    if ([itemIdentifier isEqualToString:ns_MainWindow::reloadToolbarItemIdentifier]) {
+        NSToolbarItem *reloadToolbarItem = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
+        [self updateReloadToolbarItem:reloadToolbarItem isLoading:NO];
+        
+        return [reloadToolbarItem autorelease];
+    } else if ([itemIdentifier isEqualToString:ns_MainWindow::searchToolbarItemIdentifier]) {
+        NSSearchToolbarItem *searchToolbarItem = [[NSSearchToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
+        searchToolbarItem.target = self;
+        searchToolbarItem.action = @selector(searchFieldDidTrigger:);
+        
+        return [searchToolbarItem autorelease];
+    } else {
+        return nil;
+    }
+}
+
+- (void)reloadToolbarItemDidTrigger:(NSToolbarItem *)sender {
+    if (self.reloadProgress != nil) return;
+    
+    [self updateReloadToolbarItem:sender isLoading:YES];
+    
+    __weak decltype(self) weakSelf = self;
+    NSProgress *reloadProgress = [SWCToolchainManager.sharedInstance reloadToolchainsWithCompletion:^(NSError * _Nullable error) {
+        assert(!error);
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            auto self = weakSelf;
+            self.reloadProgress = nil;
+            [self updateReloadToolbarItem:sender isLoading:NO];
+        });
+    }];
+    
+    self.reloadProgress = reloadProgress;
+}
+
+- (void)searchFieldDidTrigger:(NSSearchField *)sender {
+    NSLog(@"%@", self.toolbar.visibleItems);
+}
+
+- (void)updateReloadToolbarItem:(NSToolbarItem *)reloadToolbarItem isLoading:(BOOL)isLoading __attribute__((objc_direct)) {
+    if (isLoading) {
+        NSProgressIndicator *indicator = [NSProgressIndicator new];
+        indicator.usesThreadedAnimation = YES;
+        indicator.style = NSProgressIndicatorStyleSpinning;
+        indicator.indeterminate = YES;
+        [indicator startAnimation:nil];
+        reloadToolbarItem.view = indicator;
+        [indicator release];
+    } else {
+        reloadToolbarItem.target = self;
+        reloadToolbarItem.action = @selector(reloadToolbarItemDidTrigger:);
+        reloadToolbarItem.label = @"Reload";
+        reloadToolbarItem.image = [NSImage imageWithSystemSymbolName:@"arrow.clockwise" accessibilityDescription:nil];
+    }
 }
 
 @end
