@@ -16,7 +16,7 @@ __attribute__((objc_direct_members))
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithDataSource:(NSCollectionViewDiffableDataSource<NSString *, NSManagedObjectID *> *)dataSource;
-- (void)loadDataSourceWithToolchainCategory:(NSString *)toolchainCategory completionHandler:(void (^)(NSError * _Nullable error))completionHandler;
+- (void)loadDataSourceWithToolchainCategory:(NSString *)toolchainCategory searchText:(NSString * _Nullable)searchText completionHandler:(void (^)(NSError * _Nullable error))completionHandler;
 @end
 
 NS_ASSUME_NONNULL_END

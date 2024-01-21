@@ -1,5 +1,5 @@
 //
-//  SWCToolchainManager+Category.hpp
+//  SWCToolchainManager+Category.h
 //  Swain
 //
 //  Created by Jinwoo Kim on 1/18/24.

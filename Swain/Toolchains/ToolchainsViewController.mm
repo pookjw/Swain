@@ -23,8 +23,9 @@ __attribute__((objc_direct_members))
 
 @implementation ToolchainsViewController
 
-- (instancetype)initWithToolchainCategory:(NSString *)toolchainCategory {
+- (instancetype)initWithToolchainCategory:(NSString *)toolchainCategory searchText:(NSString * _Nullable)searchText {
     if (self = [super initWithNibName:nil bundle:nil]) {
+        _searchText = [searchText copy];
         _toolchainCategory = [toolchainCategory copy];
     }
     
@@ -32,6 +33,7 @@ __attribute__((objc_direct_members))
 }
 
 - (void)dealloc {
+    [_searchText release];
     [_toolchainCategory release];
     [_scrollView release];
     [_collectionView release];
@@ -46,9 +48,26 @@ __attribute__((objc_direct_members))
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self.viewModel loadDataSourceWithToolchainCategory:_toolchainCategory completionHandler:^(NSError * _Nullable error) {
+    [self.viewModel loadDataSourceWithToolchainCategory:_toolchainCategory searchText:_searchText completionHandler:^(NSError * _Nullable error) {
         assert(!error);
     }];
+}
+
+- (void)setSearchText:(NSString *)searchText {
+    [self willChangeValueForKey:@"searchText"];
+    
+    BOOL shouldReload = ![searchText isEqualToString:_searchText];
+    
+    [_searchText release];
+    _searchText = [searchText copy];
+    
+    if (shouldReload) {
+        [_viewModel loadDataSourceWithToolchainCategory:_toolchainCategory searchText:searchText completionHandler:^(NSError * _Nullable error) {
+            assert(!error);
+        }];
+    }
+    
+    [self didChangeValueForKey:@"searchText"];
 }
 
 - (NSScrollView *)scrollView {
@@ -87,6 +106,8 @@ __attribute__((objc_direct_members))
     [configuration release];
     
     NSCollectionView *collectionView = [NSCollectionView new];
+    collectionView.allowsEmptySelection = YES;
+    collectionView.selectable = YES;
     collectionView.collectionViewLayout = collectionViewLayout;
     collectionView.delegate = self;
     [collectionViewLayout release];
@@ -120,6 +141,10 @@ __attribute__((objc_direct_members))
     }];
     
     return [dataSource autorelease];
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths {
+    
 }
 
 @end

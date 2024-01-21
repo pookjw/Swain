@@ -9,12 +9,13 @@
 #import "MainSidebarViewController.hpp"
 #import "ToolchainsViewController.hpp"
 #import "ToolchainInspectorViewController.hpp"
-#import "SWCToolchainManager+Category.hpp"
+#import "SWCToolchainManager+Category.h"
 #import <objc/message.h>
 @import SwainCore;
 
 namespace ns_MainWindow {
     const NSToolbarIdentifier toolbarIdentifier = @"MainWindowToolbarIdentifier";
+    const NSToolbarItemIdentifier swiftToolbarItemIdentifier = @"MainWindowSwiftToolbarItemIdentifier";
     const NSToolbarItemIdentifier reloadToolbarItemIdentifier = @"MainWindowReloadToolbarItemIdentifier";
     const NSToolbarItemIdentifier searchToolbarItemIdentifier = @"MainWindowSearchToolbarItemIdentifier";
 }
@@ -37,8 +38,10 @@ __attribute__((objc_direct_members))
 @property (retain, nonatomic, readonly) ToolchainsViewController *mainToolchainsViewController;
 @property (retain, nonatomic, readonly) ToolchainsViewController *stableToolchainsViewController;
 @property (retain, nonatomic, readonly) ToolchainsViewController *releaseToolchainsViewController;
+@property (retain, nonatomic, readonly) ToolchainsViewController * _Nullable currentToolchainsViewController;
 @property (retain, nonatomic, readonly) ToolchainInspectorViewController *toolchainInspectorViewController;
 @property (retain, nonatomic) NSProgress * _Nullable reloadProgress;
+@property (retain, nonatomic, readonly) NSString * _Nullable searchText;
 @end
 
 @implementation MainWindow
@@ -136,7 +139,7 @@ __attribute__((objc_direct_members))
 - (ToolchainsViewController *)mainToolchainsViewController {
     if (auto mainToolchainsViewController = _mainToolchainsViewController) return mainToolchainsViewController;
     
-    ToolchainsViewController *mainToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryMainName()];
+    ToolchainsViewController *mainToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryMainName() searchText:self.searchText];
     
     _mainToolchainsViewController = [mainToolchainsViewController retain];
     return [mainToolchainsViewController autorelease];
@@ -145,7 +148,7 @@ __attribute__((objc_direct_members))
 - (ToolchainsViewController *)stableToolchainsViewController {
     if (auto stableToolchainsViewController = _stableToolchainsViewController) return stableToolchainsViewController;
     
-    ToolchainsViewController *stableToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryStableName()];
+    ToolchainsViewController *stableToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryStableName() searchText:self.searchText];
     
     _stableToolchainsViewController = [stableToolchainsViewController retain];
     return [stableToolchainsViewController autorelease];
@@ -154,7 +157,7 @@ __attribute__((objc_direct_members))
 - (ToolchainsViewController *)releaseToolchainsViewController {
     if (auto releaseToolchainsViewController = _releaseToolchainsViewController) return releaseToolchainsViewController;
     
-    ToolchainsViewController *releaseToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryReleaseName()];
+    ToolchainsViewController *releaseToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryReleaseName() searchText:self.searchText];
     
     _releaseToolchainsViewController = [releaseToolchainsViewController retain];
     return [releaseToolchainsViewController autorelease];
@@ -169,14 +172,31 @@ __attribute__((objc_direct_members))
     return [toolchainInspectorViewController autorelease];
 }
 
-- (void)mainSidebarViewController:(MainSidebarViewController *)mainSidebarViewController didSelectToolchainCategory:(NSString *)toolchainCategory {
-    if ([toolchainCategory isEqualToString:SWCToolchainCategoryMainName()]) {
-        [self replaceContentViewController:self.mainToolchainsViewController];
-    } else if ([toolchainCategory isEqualToString:SWCToolchainCategoryStableName()]) {
-        [self replaceContentViewController:self.stableToolchainsViewController];
-    } else if ([toolchainCategory isEqualToString:SWCToolchainCategoryReleaseName()]) {
-        [self replaceContentViewController:self.releaseToolchainsViewController];
+- (ToolchainsViewController *)currentToolchainsViewController {
+    __kindof NSViewController *contentViewController = self.contentListSplitViewItem.viewController;
+    
+    if ([contentViewController isKindOfClass:ToolchainsViewController.class]) {
+        return contentViewController;
+    } else {
+        return nil;
     }
+}
+
+- (void)mainSidebarViewController:(MainSidebarViewController *)mainSidebarViewController didSelectToolchainCategory:(NSString *)toolchainCategory {
+    ToolchainsViewController *targetToolchainsViewController;
+    
+    if ([toolchainCategory isEqualToString:SWCToolchainCategoryMainName()]) {
+        targetToolchainsViewController = self.mainToolchainsViewController;
+    } else if ([toolchainCategory isEqualToString:SWCToolchainCategoryStableName()]) {
+        targetToolchainsViewController = self.stableToolchainsViewController;
+    } else if ([toolchainCategory isEqualToString:SWCToolchainCategoryReleaseName()]) {
+        targetToolchainsViewController = self.releaseToolchainsViewController;
+    } else {
+        return;
+    }
+    
+    [self replaceContentViewController:targetToolchainsViewController];
+    targetToolchainsViewController.searchText = self.searchText;
 }
 
 - (void)replaceContentViewController:(NSViewController *)contentViewController __attribute__((objc_direct)) {
@@ -203,6 +223,7 @@ __attribute__((objc_direct_members))
 
 - (NSArray<NSToolbarItemIdentifier> *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar {
     return @[
+        ns_MainWindow::swiftToolbarItemIdentifier,
         ns_MainWindow::reloadToolbarItemIdentifier,
         ns_MainWindow::searchToolbarItemIdentifier,
         NSToolbarInspectorTrackingSeparatorItemIdentifier,
@@ -216,7 +237,28 @@ __attribute__((objc_direct_members))
 }
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSToolbarItemIdentifier)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag {
-    if ([itemIdentifier isEqualToString:ns_MainWindow::reloadToolbarItemIdentifier]) {
+    if ([itemIdentifier isEqualToString:ns_MainWindow::swiftToolbarItemIdentifier]) {
+        NSToolbarItem *swiftToolbarItem = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
+        swiftToolbarItem.image = [NSImage imageWithSystemSymbolName:@"swift" accessibilityDescription:nil];
+        swiftToolbarItem.navigational = YES;
+        swiftToolbarItem.target = self;
+        swiftToolbarItem.action = @selector(swiftToolbarItemDidTrigger:);
+        
+        // NSToolbarButton (NSButton)
+        auto _view = reinterpret_cast<NSButton * (*)(id, SEL)>(objc_msgSend)(swiftToolbarItem, sel_registerName("_view"));
+        
+        // _NSToolbarButtonCell
+        NSButtonCell *cell = static_cast<NSButtonCell *>(_view.cell);
+        
+        // Avoid NSIsEmptyRect
+        reinterpret_cast<void (*)(id, SEL, struct CGRect, id)>(objc_msgSend)(cell, sel_registerName("_updateImageViewWithFrame:inView:"), CGRectMake(0.f, 0.f, 1.f, 1.f), _view);
+
+        id buttonImageView = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(cell, sel_registerName("_buttonImageView"));
+        
+        reinterpret_cast<void (*)(id, SEL, id, id, BOOL)>(objc_msgSend)(buttonImageView, @selector(addSymbolEffect:options:animated:), [[NSSymbolBounceEffect bounceUpEffect] effectWithByLayer], [NSSymbolEffectOptions optionsWithRepeating], YES);
+        
+        return [swiftToolbarItem autorelease];
+    } else if ([itemIdentifier isEqualToString:ns_MainWindow::reloadToolbarItemIdentifier]) {
         NSToolbarItem *reloadToolbarItem = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
         [self updateReloadToolbarItem:reloadToolbarItem isLoading:NO];
         
@@ -230,6 +272,19 @@ __attribute__((objc_direct_members))
     } else {
         return nil;
     }
+}
+
+- (void)swiftToolbarItemDidTrigger:(NSToolbarItem *)sender {
+    NSURLComponents *components = [NSURLComponents new];
+    components.scheme = @"https";
+    components.host = @"www.swift.org";
+    components.path = @"/download/";
+    
+    if (auto url = components.URL) {
+        [NSWorkspace.sharedWorkspace openURL:url];
+    }
+    
+    [components release];
 }
 
 - (void)reloadToolbarItemDidTrigger:(NSToolbarItem *)sender {
@@ -252,7 +307,20 @@ __attribute__((objc_direct_members))
 }
 
 - (void)searchFieldDidTrigger:(NSSearchField *)sender {
-    NSLog(@"%@", self.toolbar.visibleItems);
+    if (auto currentToolchainsViewController = self.currentToolchainsViewController) {
+        currentToolchainsViewController.searchText = sender.stringValue;
+    }
+}
+
+- (NSString *)searchText {
+    for (NSToolbarItem *toolbarItem in self.toolbar.visibleItems) {
+        if ([toolbarItem isKindOfClass:NSSearchToolbarItem.class]) {
+            auto searchToolbarItem = reinterpret_cast<NSSearchToolbarItem *>(toolbarItem);
+            return searchToolbarItem.searchField.stringValue;
+        }
+    }
+    
+    return nil;
 }
 
 - (void)updateReloadToolbarItem:(NSToolbarItem *)reloadToolbarItem isLoading:(BOOL)isLoading __attribute__((objc_direct)) {

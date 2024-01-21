@@ -32,7 +32,7 @@
 /* Begin PBXFileReference section */
 		4F68265A2B59692B0063018F /* ToolchainsViewModel.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsViewModel.hpp; sourceTree = "<group>"; };
 		4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsViewModel.mm; sourceTree = "<group>"; };
-		4F6826632B596C0F0063018F /* SWCToolchainManager+Category.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "SWCToolchainManager+Category.hpp"; sourceTree = "<group>"; };
+		4F6826632B596C0F0063018F /* SWCToolchainManager+Category.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SWCToolchainManager+Category.h"; sourceTree = "<group>"; };
 		4F6826642B5A16080063018F /* ToolchainsCollectionViewItem.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsCollectionViewItem.hpp; sourceTree = "<group>"; };
 		4F6826652B5A16080063018F /* ToolchainsCollectionViewItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsCollectionViewItem.mm; sourceTree = "<group>"; };
 		4F9161B22B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "NSTextField+ApplyLabelStyle.hpp"; sourceTree = "<group>"; };
@@ -41,6 +41,7 @@
 		4F9162062B5BF4170068AE1F /* MainSidebarTableView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainSidebarTableView.mm; sourceTree = "<group>"; };
 		4F91622F2B5CC08F0068AE1F /* ToolchainInspectorViewController.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainInspectorViewController.hpp; sourceTree = "<group>"; };
 		4F9162302B5CC08F0068AE1F /* ToolchainInspectorViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainInspectorViewController.mm; sourceTree = "<group>"; };
+		4F9162622B5D20DC0068AE1F /* NSView+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSView+Private.h"; sourceTree = "<group>"; };
 		4FE08D0B2B54EB1B003D9FE2 /* Swain.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Swain.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AppDelegate.hpp; sourceTree = "<group>"; };
 		4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
@@ -87,9 +88,10 @@
 			children = (
 				4FE08D342B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.h */,
 				4FE08D352B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm */,
-				4F6826632B596C0F0063018F /* SWCToolchainManager+Category.hpp */,
+				4F6826632B596C0F0063018F /* SWCToolchainManager+Category.h */,
 				4F9161B22B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.hpp */,
 				4F9161B32B5BC0470068AE1F /* NSTextField+ApplyLabelStyle.mm */,
+				4F9162622B5D20DC0068AE1F /* NSView+Private.h */,
 			);
 			path = Category;
 			sourceTree = "<group>";

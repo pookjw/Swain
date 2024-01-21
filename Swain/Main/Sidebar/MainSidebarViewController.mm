@@ -26,6 +26,7 @@ __attribute__((objc_direct_members))
 @implementation MainSidebarViewController
 
 - (void)dealloc {
+    [_scrollView release];
     [_tableView release];
     [super dealloc];
 }
