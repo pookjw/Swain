@@ -11,11 +11,11 @@ import Testing
 
 final class SwainCoreTests: XCTestCase {
     override func setUp() async throws {
-        try await ToolchainManager.shared.configure()
+        _ = try await ToolchainDataManager.shared.modelContext
     }
     
     override func tearDown() async throws {
-        try await ToolchainManager.shared.destory()
+        try await ToolchainDataManager.shared.destory()
     }
     
     func testAll() async {

@@ -1,5 +1,5 @@
 //
-//  ToolchainManager+Tests.swift
+//  ToolchainDataManager+Tests.swift
 //  
 //
 //  Created by Jinwoo Kim on 1/15/24.
@@ -8,17 +8,16 @@
 import Testing
 @testable import SwainCore
 
-extension ToolchainManager {
+extension ToolchainDataManager {
     struct Tests {
-        @Test(.tags(["test_configure"])) func test_configure() async throws {
-            try await ToolchainManager.shared.configure()
+        @Test(.tags(["test_configure"])) func test_modelContext() async throws {
+            _ = try await ToolchainDataManager.shared.modelContext
         }
         
         @Test(.tags(["test_reloadToolchains"])) func test_reloadToolchains() async throws {
-            try await ToolchainManager.shared.configure()
-            try await ToolchainManager.shared.reloadToolchains()
+            try await ToolchainDataManager.shared.reloadToolchains()
             
-            let modelContext: ModelContext! = await ToolchainManager.shared.modelContext
+            let modelContext: ModelContext! = try await ToolchainDataManager.shared.modelContext
             #expect(modelContext != nil)
             
             let fetchDescriptor: FetchDescriptor<Toolchain> = .init()
@@ -27,8 +26,7 @@ extension ToolchainManager {
         }
         
         @Test(.tags(["test_managedObjectContext"])) func test_managedObjectContext() async throws {
-            try await ToolchainManager.shared.configure()
-            let managedObjectContext: NSManagedObjectContext? = await ToolchainManager.shared.managedObjectContext
+            let managedObjectContext: NSManagedObjectContext? = try await ToolchainDataManager.shared.managedObjectContext()
             #expect(managedObjectContext != nil)
         }
     }

@@ -11,9 +11,9 @@ import Foundation
 import HandyMacros
 
 @globalActor
-@objc(SWCToolchainManager)
-public actor ToolchainManager: NSObject {
-    @objc(sharedInstance) public static let shared: ToolchainManager = .init()
+@objc(SWCToolchainDataManager)
+public actor ToolchainDataManager: NSObject {
+    @objc(sharedInstance) public static let shared: ToolchainDataManager = .init()
     
     public var modelContext: ModelContext {
         get async throws {
