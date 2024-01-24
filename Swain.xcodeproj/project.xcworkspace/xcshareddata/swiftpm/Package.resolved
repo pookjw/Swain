@@ -45,21 +45,12 @@
       }
     },
     {
-      "identity" : "swift-foundation",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-foundation.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "87fdbaef20095a5c04dc952b291cc5f20d01bca6"
-      }
-    },
-    {
       "identity" : "swift-foundation-icu",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-foundation-icu",
       "state" : {
-        "revision" : "6fd27e5b500f0df92b4278b1ae255774eb084ac8",
-        "version" : "0.0.4"
+        "revision" : "11227a889fa93632ab81a43ea153f444fd515398",
+        "version" : "0.0.5"
       }
     },
     {

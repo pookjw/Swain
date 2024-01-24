@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreFoundation
 import CoreData
 import AsyncHTTPClient
 import NIOCore
@@ -13,26 +14,55 @@ import RegexBuilder
 import Darwin
 
 @globalActor
-@objc(SWCToolchainPackageManager)
-public actor ToolchainPackageManager: NSObject {
+public actor ToolchainPackageManager {
     public enum Error: Swift.Error {
         case noManagedObjectContext
         case corrupted
     }
     
-    @objc(sharedInstance)
     public static let shared: ToolchainPackageManager = .init()
+    
+    public static nonisolated func getSharedInstance() -> ToolchainPackageManager {
+        .shared
+    }
+    
+    public static nonisolated func getDidChangeDownloadingProgressesNotificationName() -> String {
+        "ToolchainPackageManagerDidChangeDownloadingProgresses"
+    }
+    
+    public private(set) var downloadingProgresses: [(name: String, progress: Progress)] = [] {
+        didSet {
+            // TODO CollectionDifference
+            
+            CFNotificationCenterPostNotification(
+                CFNotificationCenterGetLocalCenter(),
+                .init(rawValue: CFStringCreateWithCString(kCFAllocatorDefault, ToolchainPackageManager.getDidChangeDownloadingProgressesNotificationName().cString(using: .utf8), CFStringBuiltInEncodings.UTF8.rawValue)),
+                Unmanaged<ToolchainPackageManager>.passUnretained(self).toOpaque(),
+                nil,
+                .init(true)
+            )
+        }
+    }
     
     private let downloadsURL: URL = .applicationSupportDirectory
         .appending(path: "SwainCore", directoryHint: .isDirectory)
         .appending(path: "Downloads", directoryHint: .isDirectory)
     
-    private override init() {
-        super.init()
+    private init() {
+        
     }
-}
-
-extension ToolchainPackageManager {
+    
+    public nonisolated func getDownloadingNames(completionHandler: UnsafeRawPointer) {
+//        downloadingProgresses
+//            .map { $0.name }
+    }
+    
+    public nonisolated func getProgressForName(_ name: String, completionHandler: UnsafeRawPointer) {
+//        downloadingProgresses
+//            .first { $0.name == name }?
+//            .progress
+    }
+    
     public func downloadedURL(for toolchain: Toolchain) async -> URL? {
         let name: String = toolchain.name
         return downloadedURL(name: name)
@@ -53,33 +83,68 @@ extension ToolchainPackageManager {
         
         return packageURLString(name: name, categoryType: categoryType)
     }
-}
- 
-extension ToolchainPackageManager {
-    @objc public func downloadedURL(for toolchain: NSManagedObject) async throws -> URL? {
-        guard let managedObjectContext: NSManagedObjectContext = toolchain.managedObjectContext else {
-            throw Error.noManagedObjectContext
-        }
+    
+    public nonisolated func downloadedURL(for name: String, completionHandler: UnsafeRawPointer) {
+        typealias BlockType = @convention(block) @Sendable (URL?) -> Void
         
-        let name: Any? = await managedObjectContext.perform { 
-            toolchain.value(forKey: "name")
-        }
+        let copiedBlock: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as! AnyObject
+        let name: String = unsafeBitCast(name, to: String.self)
         
-        guard let name: String = name as? String else {
-            throw Error.corrupted
+        Task {
+            let unmanagedBlock: Unmanaged<AnyObject> = .passRetained(copiedBlock)
+            let castedBlock: BlockType = unsafeBitCast(unmanagedBlock.toOpaque(), to: BlockType.self)
+            _ = unmanagedBlock.autorelease()
+            
+            let result: URL? = await downloadedURL(name: name)
+            castedBlock(result)
         }
-        
-        return downloadedURL(name: name)
     }
     
-    @objc public func download(for toolchain: NSManagedObject, progressHandler: @escaping (@Sendable (_ progress: Progress) -> Void)) async throws -> URL {
-        let (name, categoryType): (String, Toolchain.Category) = try await metadata(from: toolchain)
+    public nonisolated func download(
+        for name: String,
+        category: String,
+        progressHandler: UnsafeRawPointer,
+        completionHandler: UnsafeRawPointer
+    ) {
+        typealias ProgressHandlerType = @convention(block) @Sendable (Progress) -> Void
+        typealias CompletionHandlerType = @convention(block) @Sendable (URL?, Swift.Error?) -> Void
         
-        return try await download(name: name, categoryType: categoryType, progressHandler: progressHandler)
+        guard let categoryType: Toolchain.Category = .init(rawValue: category) else {
+            let progress: Progress = .init(totalUnitCount: 1)
+            progress.cancel()
+            
+            unsafeBitCast(progressHandler, to: ProgressHandlerType.self)(progress)
+            unsafeBitCast(completionHandler, to: CompletionHandlerType.self)(nil, Error.corrupted)
+            
+            return
+        }
+        
+        let copiedProgressHandler: AnyObject = unsafeBitCast(progressHandler, to: AnyObject.self).copy() as AnyObject
+        let copiedCompletionHandler: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as AnyObject
+        
+        Task {
+            let unmanagedProgressHandler: Unmanaged<AnyObject> = .passRetained(copiedProgressHandler)
+            let unmanagedCompletionHandler: Unmanaged<AnyObject> = .passRetained(copiedCompletionHandler)
+            
+            let castedProgressHandler: ProgressHandlerType = unsafeBitCast(unmanagedProgressHandler.toOpaque(), to: ProgressHandlerType.self)
+            let castedCompletionHandler: CompletionHandlerType = unsafeBitCast(unmanagedCompletionHandler.toOpaque(), to: CompletionHandlerType.self)
+            
+            _ = unmanagedProgressHandler.autorelease()
+            _ = unmanagedCompletionHandler.autorelease()
+            
+            do {
+                let result: URL = try await download(name: name, categoryType: categoryType, progressHandler: castedProgressHandler)
+                castedCompletionHandler(result, nil)
+            } catch {
+                castedCompletionHandler(nil, error)
+            }
+        }
     }
     
-    @objc public func packageURL(for toolchain: NSManagedObject) async throws -> URL? {
-        let (name, categoryType): (String, Toolchain.Category) = try await metadata(from: toolchain)
+    public func packageURL(for name: String, category: String) async throws -> URL? {
+        guard let categoryType: Toolchain.Category = .init(rawValue: category) else {
+            return nil
+        }
         
         guard
             let urlString: String = packageURLString(name: name, categoryType: categoryType),
@@ -93,26 +158,6 @@ extension ToolchainPackageManager {
 }
  
 extension ToolchainPackageManager {
-    private func metadata(from toolchain: NSManagedObject) async throws -> (String, Toolchain.Category) {
-        guard let managedObjectContext: NSManagedObjectContext = toolchain.managedObjectContext else {
-            throw Error.noManagedObjectContext
-        }
-        
-        let (name, category): (Any?, Any?) = await managedObjectContext.perform { 
-            (toolchain.value(forKey: "name"), toolchain.value(forKey: "category"))
-        }
-        
-        guard
-            let name: String = name as? String,
-            let category: String = category as? String,
-            let categoryType: Toolchain.Category = .init(rawValue: category)
-        else {
-            throw Error.corrupted
-        }
-        
-        return (name, categoryType)
-    }
-    
     private nonisolated func destinationURL(name: String) -> URL {
         downloadsURL
             .appending(component: "\(name)-osx.pkg", directoryHint: .notDirectory)
@@ -211,6 +256,11 @@ extension ToolchainPackageManager {
                 throw Error.corrupted
             }
             
+            if access(downloadsURL.path(percentEncoded: false).cString(using: .utf8), F_OK) != .zero {
+                let result: Int32 = mkdir(downloadsURL.path(percentEncoded: false), S_IRWXU | S_IRWXG | S_IRWXO)
+                assert(result == .zero)
+            }
+            
             let destinationURL: URL = destinationURL(name: name)
             let destinationTmpURL: URL = destinationURL
                 .appendingPathExtension("tmp")
@@ -222,19 +272,26 @@ extension ToolchainPackageManager {
             
             let progress: Progress = .init(totalUnitCount: contentLength)
             _progress = progress
+            
+            downloadingProgresses.append((name, progress))
             progressHandler(progress)
             
             let file: UnsafeMutablePointer<FILE> = fopen(destinationTmpURL.path(percentEncoded: false).cString(using: .utf8), "a+")
             _file = file
-            
+
             for try await buffer in response.body {
+                try Task.checkCancellation()
+                
+                if progress.isCancelled {
+                    throw CancellationError()
+                }
+                
                 buffer.readableBytesView.withUnsafeBytes { p in
                     let result: Int = fwrite(p.baseAddress, MemoryLayout<NIOCore.ByteBufferView.Element>.size, p.count, file)
                     assert(result != .zero)
                 }
                 
                 progress.completedUnitCount += Int64(buffer.capacity)
-                print(destinationTmpURL, progress.fractionCompleted)
             }
             
             try await client.shutdown()

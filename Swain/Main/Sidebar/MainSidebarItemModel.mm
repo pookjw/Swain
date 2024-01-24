@@ -84,11 +84,11 @@ __attribute__((objc_direct_members))
 - (NSString *)toolchainCategory {
     switch (_type) {
         case MainSidebarItemModelTypeStable:
-            return SWCToolchainCategoryStableName();
+            return SwainCore::Toolchain::getCategoryStableName();
         case MainSidebarItemModelTypeRelease:
-            return SWCToolchainCategoryReleaseName();
+            return SwainCore::Toolchain::getCategoryReleaseName();
         case MainSidebarItemModelTypeMain:
-            return SWCToolchainCategoryMainName();
+            return SwainCore::Toolchain::getCategoryMainName();
         default:
             return nil;
     }

@@ -8,9 +8,16 @@
 #import "ToolchainsCollectionViewItem.hpp"
 #import "NSTextField+ApplyLabelStyle.hpp"
 #import "NSView+Private.h"
+#import <CoreFoundation/CoreFoundation.h>
 #import <objc/message.h>
+@import SwainCore;
 
-NSUserInterfaceItemIdentifier const identifier = NSStringFromClass(ToolchainsCollectionViewItem.class);
+namespace ns_ToolchainsCollectionViewItem {
+    NSUserInterfaceItemIdentifier const identifier = NSStringFromClass(ToolchainsCollectionViewItem.class);
+void callback(CFNotificationCenterRef center, void *observer, CFNotificationName name, const void *object, CFDictionaryRef userInfo) {
+    NSLog(@"Hello!");
+}
+}
 
 __attribute__((objc_direct_members))
 @interface ToolchainsCollectionViewItem () {
@@ -25,14 +32,72 @@ __attribute__((objc_direct_members))
 @implementation ToolchainsCollectionViewItem
 
 + (NSUserInterfaceItemIdentifier)identifier {
-    return identifier;
+    return ns_ToolchainsCollectionViewItem::identifier;
+}
+
+- (instancetype)initWithNibName:(NSNibName)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        [self commonInit_ToolchainsCollectionViewItem];
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    if (self = [super initWithCoder:coder]) {
+        [self commonInit_ToolchainsCollectionViewItem];
+    }
+    
+    return self;
 }
 
 - (void)dealloc {
+    void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
+    swift::String name = SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName();
+    const char *cString = [static_cast<NSString *>(name) cStringUsingEncoding:NSUTF8StringEncoding];
+    CFStringRef cfString = CFStringCreateWithCString(kCFAllocatorDefault,
+                                                     cString,
+                                                     kCFStringEncodingUTF8);
+    
+    CFNotificationCenterRemoveObserver(CFNotificationCenterGetLocalCenter(),
+                                       self,
+                                       cfString,
+                                       object);
+    
     [_stackView release];
     [_downloadButton release];
     [_managedObjectID release];
     [super dealloc];
+}
+
+- (void)commonInit_ToolchainsCollectionViewItem __attribute__((objc_direct)) {
+    void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
+    
+    
+    swift::String name = SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName();
+//    CFStringRef cfString = CFStringCreateWithCString(kCFAllocatorDefault,
+//                                                     swift::_impl::_impl_String::getOpaquePointer(name),
+//                                                     kCFStringEncodingUTF8);
+    
+    const char *cString = [static_cast<NSString *>(name) cStringUsingEncoding:NSUTF8StringEncoding];
+    CFStringRef cfString = CFStringCreateWithCString(kCFAllocatorDefault,
+                                                     cString,
+                                                     kCFStringEncodingUTF8);
+    
+    CFNotificationCenterAddObserver(CFNotificationCenterGetLocalCenter(),
+                                    self,
+                                    ns_ToolchainsCollectionViewItem::callback,
+                                    cfString,
+                                    object,
+                                    CFNotificationSuspensionBehaviorDeliverImmediately);
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"completedUnitCount"]) {
+        NSLog(@"%f", reinterpret_cast<NSProgress *>(object).fractionCompleted);
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
 }
 
 - (void)setSelected:(BOOL)selected {
@@ -118,7 +183,30 @@ __attribute__((objc_direct_members))
 }
 
 - (void)downloadButtonDidTrigger:(NSButton *)sender {
+    using namespace SwainCore;
     
+    auto managedObjectID = self.managedObjectID;
+    
+    ToolchainDataManager::getSharedInstance();
+    ToolchainDataManager::getSharedInstance().managedObjectContext(^(NSManagedObjectContext * _Nullable context, NSError * _Nullable error) {
+        assert(!error);
+        
+        [context performBlock:^{
+            NSManagedObject *toolchain = [context objectWithID:managedObjectID];
+            NSString *name = [toolchain valueForKey:@"name"];
+            NSString *category = [toolchain valueForKey:@"category"];
+            
+            ToolchainPackageManager::getSharedInstance().download([name cStringUsingEncoding:NSUTF8StringEncoding],
+                                                                  [category cStringUsingEncoding:NSUTF8StringEncoding],
+                                                                  ^(NSProgress *progress) {
+                [progress addObserver:self forKeyPath:@"completedUnitCount" options:NSKeyValueObservingOptionNew context:NULL];
+            },
+                                                                  ^(NSURL * _Nullable url, NSError * _Nullable error) {
+                assert(!error);
+                NSLog(@"%@", url);
+            });
+        }];
+    });
 }
 
 - (void)updateBackgroundColor __attribute__((objc_direct)) {

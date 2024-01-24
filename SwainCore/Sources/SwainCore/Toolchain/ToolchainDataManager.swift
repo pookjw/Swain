@@ -11,9 +11,12 @@ import Foundation
 import HandyMacros
 
 @globalActor
-@objc(SWCToolchainDataManager)
-public actor ToolchainDataManager: NSObject {
-    @objc(sharedInstance) public static let shared: ToolchainDataManager = .init()
+public actor ToolchainDataManager {
+    public static let shared: ToolchainDataManager = .init()
+    
+    public static func getSharedInstance() -> ToolchainDataManager {
+        .shared
+    }
     
     public var modelContext: ModelContext {
         get async throws {
@@ -57,19 +60,36 @@ public actor ToolchainDataManager: NSObject {
     private var _modelContext: ModelContext?
     private var _modelContainer: ModelContainer?
     
-    private override init() {
-        super.init()
+    private init() {
+        
     }
     
-    @objc public func managedObjectContext() async throws -> NSManagedObjectContext! {
+    public func managedObjectContext() async throws -> NSManagedObjectContext! {
         let modelContext: ModelContext = try await modelContext
         
         return Mirror(reflecting: modelContext)
             .descendant("_nsContext") as? NSManagedObjectContext
     }
     
-    @AddObjCCompletionHandler
-    public nonisolated func reloadToolchains() async throws {
+    public nonisolated func managedObjectContext(completionHandler: UnsafeRawPointer) {
+        typealias BlockType = @convention(block) (_ managedObjectContext: NSManagedObjectContext?, _ error: Error?) -> Void
+        let copied: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as! AnyObject
+        
+        Task {
+            let unmanaged: Unmanaged<AnyObject> = .passRetained(copied)
+            let castedBlock: BlockType = unsafeBitCast(unmanaged.toOpaque(), to: BlockType.self)
+            _ = unmanaged.autorelease()
+            
+            do {
+                let managedObjectContext: NSManagedObjectContext? = try await managedObjectContext()
+                castedBlock(managedObjectContext, nil)
+            } catch {
+                castedBlock(nil, error)
+            }
+        }
+    }
+    
+    public func reloadToolchains() async throws {
         let refs: [GitHub.Ref] = try await GitHub.swiftRefs()
         try Task.checkCancellation()
         let modelContext: ModelContext = try await modelContext
@@ -97,6 +117,40 @@ public actor ToolchainDataManager: NSObject {
             
             try modelContext.save()
         }
+    }
+    
+    public nonisolated func reloadToolchains(completionHandler: UnsafeRawPointer) -> UnsafeRawPointer {
+        typealias BlockType = @convention(block) @Sendable (Swift.Error?) -> Void
+        
+        let copied: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as! AnyObject
+        let progress: Foundation.Progress = .init(totalUnitCount: 1)
+        
+        let task: Task<Void, Never> = .init {
+            let unmanaged: Unmanaged<AnyObject> = .passRetained(copied)
+            let castedBlock: BlockType = unsafeBitCast(unmanaged.toOpaque(), to: BlockType.self)
+            _ = unmanaged.autorelease()
+            
+            let error: Swift.Error?
+            
+            do {
+                try await reloadToolchains()
+                error = nil
+            } catch let _error {
+                error = _error
+            }
+            
+            progress.completedUnitCount = 1
+            castedBlock(error)
+        }
+        
+        progress.cancellationHandler = {
+            task.cancel()
+        }
+        
+        let unmanaged: Unmanaged<Progress> = .passRetained(progress)
+        _ = unmanaged.autorelease()
+        
+        return .init(unmanaged.toOpaque())
     }
     
     @_spi(SwainCoreTests) public func destory() async throws {

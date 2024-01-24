@@ -6,6 +6,7 @@
 //
 
 #import "ToolchainInspectorViewController.hpp"
+@import SwainCore;
 
 @interface ToolchainInspectorViewController ()
 
@@ -17,6 +18,7 @@
     [super viewDidLoad];
     self.view.wantsLayer = YES;
     self.view.layer.backgroundColor = NSColor.orangeColor.CGColor;
+    
 }
 
 @end

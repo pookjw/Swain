@@ -64,7 +64,7 @@ __attribute__((objc_direct_members))
             
             self.requestedLoading = NO;
         } else {
-            [SWCToolchainManager.sharedInstance managedObjectContextWithCompletionHandler:^(NSManagedObjectContext * _Nullable managedObjectContext, NSError * _Nullable error) {
+            SwainCore::ToolchainDataManager::getSharedInstance().managedObjectContext(^(NSManagedObjectContext * _Nullable managedObjectContext, NSError * _Nullable error) {
                 if (error) {
                     completionHandler(error);
                     return;
@@ -92,7 +92,7 @@ __attribute__((objc_direct_members))
                     
                     self.requestedLoading = NO;
                 });
-            }];
+            });
         }
     });
 }

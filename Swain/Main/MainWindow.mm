@@ -9,7 +9,6 @@
 #import "MainSidebarViewController.hpp"
 #import "ToolchainsViewController.hpp"
 #import "ToolchainInspectorViewController.hpp"
-#import "SWCToolchainManager+Category.h"
 #import <objc/message.h>
 @import SwainCore;
 
@@ -139,7 +138,7 @@ __attribute__((objc_direct_members))
 - (ToolchainsViewController *)mainToolchainsViewController {
     if (auto mainToolchainsViewController = _mainToolchainsViewController) return mainToolchainsViewController;
     
-    ToolchainsViewController *mainToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryMainName() searchText:self.searchText];
+    ToolchainsViewController *mainToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SwainCore::Toolchain::getCategoryMainName() searchText:self.searchText];
     
     _mainToolchainsViewController = [mainToolchainsViewController retain];
     return [mainToolchainsViewController autorelease];
@@ -148,7 +147,7 @@ __attribute__((objc_direct_members))
 - (ToolchainsViewController *)stableToolchainsViewController {
     if (auto stableToolchainsViewController = _stableToolchainsViewController) return stableToolchainsViewController;
     
-    ToolchainsViewController *stableToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryStableName() searchText:self.searchText];
+    ToolchainsViewController *stableToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SwainCore::Toolchain::getCategoryStableName() searchText:self.searchText];
     
     _stableToolchainsViewController = [stableToolchainsViewController retain];
     return [stableToolchainsViewController autorelease];
@@ -157,7 +156,7 @@ __attribute__((objc_direct_members))
 - (ToolchainsViewController *)releaseToolchainsViewController {
     if (auto releaseToolchainsViewController = _releaseToolchainsViewController) return releaseToolchainsViewController;
     
-    ToolchainsViewController *releaseToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SWCToolchainCategoryReleaseName() searchText:self.searchText];
+    ToolchainsViewController *releaseToolchainsViewController = [[ToolchainsViewController alloc] initWithToolchainCategory:SwainCore::Toolchain::getCategoryReleaseName() searchText:self.searchText];
     
     _releaseToolchainsViewController = [releaseToolchainsViewController retain];
     return [releaseToolchainsViewController autorelease];
@@ -185,11 +184,11 @@ __attribute__((objc_direct_members))
 - (void)mainSidebarViewController:(MainSidebarViewController *)mainSidebarViewController didSelectToolchainCategory:(NSString *)toolchainCategory {
     ToolchainsViewController *targetToolchainsViewController;
     
-    if ([toolchainCategory isEqualToString:SWCToolchainCategoryMainName()]) {
+    if ([toolchainCategory isEqualToString:SwainCore::Toolchain::getCategoryMainName()]) {
         targetToolchainsViewController = self.mainToolchainsViewController;
-    } else if ([toolchainCategory isEqualToString:SWCToolchainCategoryStableName()]) {
+    } else if ([toolchainCategory isEqualToString:SwainCore::Toolchain::getCategoryStableName()]) {
         targetToolchainsViewController = self.stableToolchainsViewController;
-    } else if ([toolchainCategory isEqualToString:SWCToolchainCategoryReleaseName()]) {
+    } else if ([toolchainCategory isEqualToString:SwainCore::Toolchain::getCategoryReleaseName()]) {
         targetToolchainsViewController = self.releaseToolchainsViewController;
     } else {
         return;
@@ -293,7 +292,8 @@ __attribute__((objc_direct_members))
     [self updateReloadToolbarItem:sender isLoading:YES];
     
     __weak decltype(self) weakSelf = self;
-    NSProgress *reloadProgress = [SWCToolchainManager.sharedInstance reloadToolchainsWithCompletion:^(NSError * _Nullable error) {
+    
+    const void *reloadProgressPtr = SwainCore::ToolchainDataManager::getSharedInstance().reloadToolchains(^(NSError * _Nullable error) {
         assert(!error);
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -301,9 +301,9 @@ __attribute__((objc_direct_members))
             self.reloadProgress = nil;
             [self updateReloadToolbarItem:sender isLoading:NO];
         });
-    }];
+    });
     
-    self.reloadProgress = reloadProgress;
+    self.reloadProgress = reinterpret_cast<NSProgress *>(reloadProgressPtr);
 }
 
 - (void)searchFieldDidTrigger:(NSSearchField *)sender {
@@ -333,6 +333,7 @@ __attribute__((objc_direct_members))
         reloadToolbarItem.view = indicator;
         [indicator release];
     } else {
+        reloadToolbarItem.view = nil;
         reloadToolbarItem.target = self;
         reloadToolbarItem.action = @selector(reloadToolbarItemDidTrigger:);
         reloadToolbarItem.label = @"Reload";

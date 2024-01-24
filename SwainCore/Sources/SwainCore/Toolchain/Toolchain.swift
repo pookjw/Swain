@@ -9,27 +9,43 @@ import Foundation
 import SwiftData
 import RegexBuilder
 
-@_cdecl("SWCToolchainCategoryStableName")
+////@_cdecl("SWCToolchainCategoryStableName")
 //@_expose(Cxx, "SWCToolchainCategoryStableName")
-public func SWCToolchainCategoryStableName() -> String {
-    Toolchain.Category.stable.rawValue
-}
-
-@_cdecl("SWCToolchainCategoryReleaseName") public func SWCToolchainCategoryReleaseName() -> String {
-    Toolchain.Category.release.rawValue
-}
-
-@_cdecl("SWCToolchainCategoryMainName") public func SWCToolchainCategoryMainName() -> String {
-    Toolchain.Category.main.rawValue
-}
+//public func SWCToolchainCategoryStableName() -> String {
+//    Toolchain.Category.stable.rawValue
+//}
+//
+////@_cdecl("SWCToolchainCategoryReleaseName") 
+//@_expose(Cxx, "SWCToolchainCategoryReleaseName")
+//public func SWCToolchainCategoryReleaseName() -> String {
+//    Toolchain.Category.release.rawValue
+//}
+//
+////@_cdecl("SWCToolchainCategoryMainName")
+//@_expose(Cxx, "SWCToolchainCategoryMainName")
+//public func SWCToolchainCategoryMainName() -> String {
+//    Toolchain.Category.main.rawValue
+//}
 
 @Model
 public final class Toolchain: Hashable, Sendable {
-    public enum Category: String, Hashable, Sendable {
+    public static func getCategoryStableName() -> String {
+        Category.stable.rawValue
+    }
+    
+    public static func getCategoryReleaseName() -> String {
+        Category.release.rawValue
+    }
+    
+    public static func getCategoryMainName() -> String {
+        Category.main.rawValue
+    }
+    
+    enum Category: String, Hashable, Sendable {
         case stable, release, main
     }
     
-    public var categoryType: Category {
+    var categoryType: Category {
         @storageRestrictions(accesses: _$backingData, initializes: _category)
         init(initialValue) {
             _$backingData.setValue(forKey: \.category, to: initialValue.rawValue)
