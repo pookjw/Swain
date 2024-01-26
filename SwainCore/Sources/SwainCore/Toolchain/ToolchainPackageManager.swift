@@ -20,6 +20,11 @@ public actor ToolchainPackageManager {
         case corrupted
     }
     
+    public struct DownloadingProgress: Hashable {
+        public let name: String
+        public let progress: Progress
+    }
+    
     public static let shared: ToolchainPackageManager = .init()
     
     public static nonisolated func getSharedInstance() -> ToolchainPackageManager {
@@ -30,9 +35,25 @@ public actor ToolchainPackageManager {
         "ToolchainPackageManagerDidChangeDownloadingProgresses"
     }
     
-    public private(set) var downloadingProgresses: [(name: String, progress: Progress)] = [] {
+    public static nonisolated func deletedNamesKey() -> String {
+        "deletedNamesKey"
+    }
+    
+    public static nonisolated func insertedNamesKey() -> String {
+        "insertedNamesKey"
+    }
+    
+    public private(set) var downloadingProgresses: [DownloadingProgress] = [] {
         didSet {
-            // TODO CollectionDifference
+            guard oldValue != downloadingProgresses else { return }
+            
+            let difference: CollectionDifference<DownloadingProgress> = oldValue.difference(from: downloadingProgresses)
+            
+            
+            
+            let userInfo: CFMutableDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 2, nil, nil)
+            var deletedName: CFString = CFStringCreateWithCString(kCFAllocatorDefault, "deletedNames", CFStringBuiltInEncodings.UTF8.rawValue)
+            CFDictionaryAddValue(userInfo, &deletedName, nil)
             
             CFNotificationCenterPostNotification(
                 CFNotificationCenterGetLocalCenter(),
@@ -232,6 +253,10 @@ extension ToolchainPackageManager {
             return downloadedURL
         }
         
+        defer {
+            downloadingProgresses.removeAll { $0.name == name }
+        }
+        
         var _progress: Progress?
         var _client: AsyncHTTPClient.HTTPClient?
         var _file: UnsafeMutablePointer<FILE>?
@@ -273,7 +298,8 @@ extension ToolchainPackageManager {
             let progress: Progress = .init(totalUnitCount: contentLength)
             _progress = progress
             
-            downloadingProgresses.append((name, progress))
+            let downloadingProgress: DownloadingProgress = .init(name: name, progress: progress)
+            downloadingProgresses.append(downloadingProgress)
             progressHandler(progress)
             
             let file: UnsafeMutablePointer<FILE> = fopen(destinationTmpURL.path(percentEncoded: false).cString(using: .utf8), "a+")

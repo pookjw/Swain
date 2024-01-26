@@ -27,6 +27,7 @@
 		4FE08D442B5511B9003D9FE2 /* MainSidebarTableCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D432B5511B9003D9FE2 /* MainSidebarTableCellView.mm */; };
 		4FE08D462B5511C3003D9FE2 /* MainSidebarTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4FE08D452B5511C3003D9FE2 /* MainSidebarTableCellView.xib */; };
 		4FE64ABD2B58203700558BCC /* MainSidebarItemModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE64ABC2B58203700558BCC /* MainSidebarItemModel.mm */; };
+		4FF05FEB2B62A0A4006EA354 /* getStdStringFromSwiftString.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FF05FE92B62A0A4006EA354 /* getStdStringFromSwiftString.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +65,8 @@
 		4FE08D452B5511C3003D9FE2 /* MainSidebarTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainSidebarTableCellView.xib; sourceTree = "<group>"; };
 		4FE64ABB2B58203700558BCC /* MainSidebarItemModel.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainSidebarItemModel.hpp; sourceTree = "<group>"; };
 		4FE64ABC2B58203700558BCC /* MainSidebarItemModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainSidebarItemModel.mm; sourceTree = "<group>"; };
+		4FF05FE92B62A0A4006EA354 /* getStdStringFromSwiftString.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = getStdStringFromSwiftString.mm; sourceTree = "<group>"; };
+		4FF05FEA2B62A0A4006EA354 /* getStdStringFromSwiftString.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = getStdStringFromSwiftString.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +144,8 @@
 			children = (
 				4FE08D0E2B54EB1B003D9FE2 /* AppDelegate.hpp */,
 				4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */,
+				4FF05FEA2B62A0A4006EA354 /* getStdStringFromSwiftString.hpp */,
+				4FF05FE92B62A0A4006EA354 /* getStdStringFromSwiftString.mm */,
 				4F9161B12B5BC0120068AE1F /* Category */,
 				4FE08D2D2B54F842003D9FE2 /* Main */,
 				4FE08D372B54FE72003D9FE2 /* Toolchains */,
@@ -265,6 +270,7 @@
 				4FE08D332B54FB2E003D9FE2 /* MainSidebarViewController.mm in Sources */,
 				4F68265C2B59692B0063018F /* ToolchainsViewModel.mm in Sources */,
 				4FE08D442B5511B9003D9FE2 /* MainSidebarTableCellView.mm in Sources */,
+				4FF05FEB2B62A0A4006EA354 /* getStdStringFromSwiftString.mm in Sources */,
 				4FE08D1A2B54EB1C003D9FE2 /* main.mm in Sources */,
 				4F6826662B5A16080063018F /* ToolchainsCollectionViewItem.mm in Sources */,
 				4FE08D362B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm in Sources */,

@@ -8,6 +8,7 @@
 #import "ToolchainsCollectionViewItem.hpp"
 #import "NSTextField+ApplyLabelStyle.hpp"
 #import "NSView+Private.h"
+#import "getStdStringFromSwiftString.hpp"
 #import <CoreFoundation/CoreFoundation.h>
 #import <objc/message.h>
 @import SwainCore;
@@ -15,7 +16,9 @@
 namespace ns_ToolchainsCollectionViewItem {
     NSUserInterfaceItemIdentifier const identifier = NSStringFromClass(ToolchainsCollectionViewItem.class);
 void callback(CFNotificationCenterRef center, void *observer, CFNotificationName name, const void *object, CFDictionaryRef userInfo) {
-    NSLog(@"Hello!");
+    auto item = [[reinterpret_cast<ToolchainsCollectionViewItem *>(object) retain] autorelease];
+    
+    
 }
 }
 
@@ -53,11 +56,7 @@ __attribute__((objc_direct_members))
 
 - (void)dealloc {
     void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
-    swift::String name = SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName();
-    const char *cString = [static_cast<NSString *>(name) cStringUsingEncoding:NSUTF8StringEncoding];
-    CFStringRef cfString = CFStringCreateWithCString(kCFAllocatorDefault,
-                                                     cString,
-                                                     kCFStringEncodingUTF8);
+    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
     
     CFNotificationCenterRemoveObserver(CFNotificationCenterGetLocalCenter(),
                                        self,
@@ -72,17 +71,7 @@ __attribute__((objc_direct_members))
 
 - (void)commonInit_ToolchainsCollectionViewItem __attribute__((objc_direct)) {
     void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
-    
-    
-    swift::String name = SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName();
-//    CFStringRef cfString = CFStringCreateWithCString(kCFAllocatorDefault,
-//                                                     swift::_impl::_impl_String::getOpaquePointer(name),
-//                                                     kCFStringEncodingUTF8);
-    
-    const char *cString = [static_cast<NSString *>(name) cStringUsingEncoding:NSUTF8StringEncoding];
-    CFStringRef cfString = CFStringCreateWithCString(kCFAllocatorDefault,
-                                                     cString,
-                                                     kCFStringEncodingUTF8);
+    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
     
     CFNotificationCenterAddObserver(CFNotificationCenterGetLocalCenter(),
                                     self,
