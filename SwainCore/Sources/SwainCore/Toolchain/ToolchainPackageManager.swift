@@ -13,16 +13,17 @@ import NIOCore
 import RegexBuilder
 import Darwin
 
+extension ProgressUserInfoKey {
+    public static var toolchainNameKey: ProgressUserInfoKey {
+        .init("toolchainName")
+    }
+}
+
 @globalActor
 public actor ToolchainPackageManager {
     public enum Error: Swift.Error {
         case noManagedObjectContext
         case corrupted
-    }
-    
-    public struct DownloadingProgress: Hashable {
-        public let name: String
-        public let progress: Progress
     }
     
     public static let shared: ToolchainPackageManager = .init()
@@ -35,33 +36,21 @@ public actor ToolchainPackageManager {
         "ToolchainPackageManagerDidChangeDownloadingProgresses"
     }
     
-    public static nonisolated func deletedNamesKey() -> String {
+    public static nonisolated var toolchainNameProgressUserInfoKey: String {
+        ProgressUserInfoKey.toolchainNameKey.rawValue
+    }
+    
+    public static nonisolated var deletedNamesKey: String {
         "deletedNamesKey"
     }
     
-    public static nonisolated func insertedNamesKey() -> String {
+    public static nonisolated var insertedNamesKey: String {
         "insertedNamesKey"
     }
     
-    public private(set) var downloadingProgresses: [DownloadingProgress] = [] {
+    public private(set) var downloadingProgresses: [Progress] = [] {
         didSet {
-            guard oldValue != downloadingProgresses else { return }
-            
-            let difference: CollectionDifference<DownloadingProgress> = oldValue.difference(from: downloadingProgresses)
-            
-            
-            
-            let userInfo: CFMutableDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 2, nil, nil)
-            var deletedName: CFString = CFStringCreateWithCString(kCFAllocatorDefault, "deletedNames", CFStringBuiltInEncodings.UTF8.rawValue)
-            CFDictionaryAddValue(userInfo, &deletedName, nil)
-            
-            CFNotificationCenterPostNotification(
-                CFNotificationCenterGetLocalCenter(),
-                .init(rawValue: CFStringCreateWithCString(kCFAllocatorDefault, ToolchainPackageManager.getDidChangeDownloadingProgressesNotificationName().cString(using: .utf8), CFStringBuiltInEncodings.UTF8.rawValue)),
-                Unmanaged<ToolchainPackageManager>.passUnretained(self).toOpaque(),
-                nil,
-                .init(true)
-            )
+            postNotificationForDonwloadingProgressesChanges(oldValue: oldValue, newValue: downloadingProgresses)
         }
     }
     
@@ -71,17 +60,6 @@ public actor ToolchainPackageManager {
     
     private init() {
         
-    }
-    
-    public nonisolated func getDownloadingNames(completionHandler: UnsafeRawPointer) {
-//        downloadingProgresses
-//            .map { $0.name }
-    }
-    
-    public nonisolated func getProgressForName(_ name: String, completionHandler: UnsafeRawPointer) {
-//        downloadingProgresses
-//            .first { $0.name == name }?
-//            .progress
     }
     
     public func downloadedURL(for toolchain: Toolchain) async -> URL? {
@@ -97,12 +75,31 @@ public actor ToolchainPackageManager {
         return try await download(name: name, categoryType: categoryType, progressHandler: progressHandler)
     }
     
-    public func packageURLString(for toolchain: Toolchain) async -> String? {
-        let (name, categoryType): (String, Toolchain.Category) = await MainActor.run {
-            (toolchain.name, toolchain.categoryType)
+    public func packageURL(for name: String, category: String) async throws -> URL? {
+        guard let categoryType: Toolchain.Category = .init(rawValue: category) else {
+            return nil
         }
         
-        return packageURLString(name: name, categoryType: categoryType)
+        guard
+            let urlString: String = packageURLString(name: name, categoryType: categoryType),
+            let url: URL = .init(string: urlString)
+        else {
+            return nil
+        }
+        
+        return url
+    }
+    
+    public nonisolated func getDownloadingProgresses(completionHandler: UnsafeRawPointer) {
+        typealias BlockType = @convention(block) @Sendable ([Progress]) -> Void
+        
+        let copiedBlock: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as! AnyObject
+        
+        Task {
+            let castedBlock: BlockType = unsafeBitCast(copiedBlock, to: BlockType.self)
+            let downloadingProgresses: [Progress] = await downloadingProgresses
+            castedBlock(downloadingProgresses)
+        }
     }
     
     public nonisolated func downloadedURL(for name: String, completionHandler: UnsafeRawPointer) {
@@ -112,9 +109,7 @@ public actor ToolchainPackageManager {
         let name: String = unsafeBitCast(name, to: String.self)
         
         Task {
-            let unmanagedBlock: Unmanaged<AnyObject> = .passRetained(copiedBlock)
-            let castedBlock: BlockType = unsafeBitCast(unmanagedBlock.toOpaque(), to: BlockType.self)
-            _ = unmanagedBlock.autorelease()
+            let castedBlock: BlockType = unsafeBitCast(copiedBlock, to: BlockType.self)
             
             let result: URL? = await downloadedURL(name: name)
             castedBlock(result)
@@ -144,14 +139,8 @@ public actor ToolchainPackageManager {
         let copiedCompletionHandler: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as AnyObject
         
         Task {
-            let unmanagedProgressHandler: Unmanaged<AnyObject> = .passRetained(copiedProgressHandler)
-            let unmanagedCompletionHandler: Unmanaged<AnyObject> = .passRetained(copiedCompletionHandler)
-            
-            let castedProgressHandler: ProgressHandlerType = unsafeBitCast(unmanagedProgressHandler.toOpaque(), to: ProgressHandlerType.self)
-            let castedCompletionHandler: CompletionHandlerType = unsafeBitCast(unmanagedCompletionHandler.toOpaque(), to: CompletionHandlerType.self)
-            
-            _ = unmanagedProgressHandler.autorelease()
-            _ = unmanagedCompletionHandler.autorelease()
+            let castedProgressHandler: ProgressHandlerType = unsafeBitCast(copiedProgressHandler, to: ProgressHandlerType.self)
+            let castedCompletionHandler: CompletionHandlerType = unsafeBitCast(copiedCompletionHandler, to: CompletionHandlerType.self)
             
             do {
                 let result: URL = try await download(name: name, categoryType: categoryType, progressHandler: castedProgressHandler)
@@ -160,21 +149,6 @@ public actor ToolchainPackageManager {
                 castedCompletionHandler(nil, error)
             }
         }
-    }
-    
-    public func packageURL(for name: String, category: String) async throws -> URL? {
-        guard let categoryType: Toolchain.Category = .init(rawValue: category) else {
-            return nil
-        }
-        
-        guard
-            let urlString: String = packageURLString(name: name, categoryType: categoryType),
-            let url: URL = .init(string: urlString)
-        else {
-            return nil
-        }
-        
-        return url
     }
 }
  
@@ -253,10 +227,6 @@ extension ToolchainPackageManager {
             return downloadedURL
         }
         
-        defer {
-            downloadingProgresses.removeAll { $0.name == name }
-        }
-        
         var _progress: Progress?
         var _client: AsyncHTTPClient.HTTPClient?
         var _file: UnsafeMutablePointer<FILE>?
@@ -296,10 +266,10 @@ extension ToolchainPackageManager {
             }
             
             let progress: Progress = .init(totalUnitCount: contentLength)
+            progress.setUserInfoObject(name, forKey: .toolchainNameKey)
             _progress = progress
             
-            let downloadingProgress: DownloadingProgress = .init(name: name, progress: progress)
-            downloadingProgresses.append(downloadingProgress)
+            downloadingProgresses.append(progress)
             progressHandler(progress)
             
             let file: UnsafeMutablePointer<FILE> = fopen(destinationTmpURL.path(percentEncoded: false).cString(using: .utf8), "a+")
@@ -347,5 +317,115 @@ extension ToolchainPackageManager {
             
             throw error
         }
+    }
+    
+    private func postNotificationForDonwloadingProgressesChanges(oldValue: [Progress], newValue: [Progress]) {
+        guard oldValue != newValue else { return }
+        
+        let difference: CollectionDifference<Progress> = newValue.difference(from: oldValue)
+        guard !difference.isEmpty else { return }
+        
+        let userInfo: CFMutableDictionary = withUnsafePointer(to: kCFTypeDictionaryKeyCallBacks) { p1 in
+            withUnsafePointer(to: kCFTypeDictionaryValueCallBacks) { p2 in
+                CFDictionaryCreateMutable(
+                    kCFAllocatorDefault,
+                    .zero,
+                    p1,
+                    p2
+                )
+            }
+        }
+        
+        //
+        
+        let removals: [CollectionDifference<Progress>.Change] = difference.removals
+        if !removals.isEmpty {
+            let deletedNames: CFMutableSet = withUnsafePointer(to: kCFTypeSetCallBacks) { p in
+                CFSetCreateMutable(kCFAllocatorDefault, removals.count, p)
+            }
+            
+            for removal in removals {
+                switch removal {
+                case .remove(let offset, let element, let associatedWith):
+                    if let name: String = element.userInfo[.toolchainNameKey] as? String {
+                        let name: CFString = CFStringCreateWithCString(
+                            kCFAllocatorDefault,
+                            name,
+                            CFStringBuiltInEncodings.UTF8.rawValue
+                        )
+                        
+                        CFSetAddValue(deletedNames, unsafeBitCast(name, to: UnsafeRawPointer.self))
+                    }
+                default:
+                    break
+                }
+            }
+            
+            let key: CFString = CFStringCreateWithCString(
+                kCFAllocatorDefault,
+                ToolchainPackageManager.deletedNamesKey,
+                CFStringBuiltInEncodings.UTF8.rawValue
+            )
+            
+            CFDictionarySetValue(
+                userInfo,
+                unsafeBitCast(key, to: UnsafeRawPointer.self),
+                unsafeBitCast(deletedNames, to: UnsafeRawPointer.self)
+            )
+        }
+        
+        //
+        
+        let insertions: [CollectionDifference<Progress>.Change] = difference.insertions
+        if !insertions.isEmpty {
+            let insertedNames: CFMutableSet = withUnsafePointer(to: kCFTypeSetCallBacks) { p in
+                CFSetCreateMutable(kCFAllocatorDefault, insertions.count, p)
+            }
+            
+            for insertion in insertions {
+                switch insertion {
+                case .insert(let offset, let element, let associatedWith):
+                    if let name: String = element.userInfo[.toolchainNameKey] as? String {
+                        let name: CFString = CFStringCreateWithCString(
+                            kCFAllocatorDefault,
+                            name,
+                            CFStringBuiltInEncodings.UTF8.rawValue
+                        )
+                        
+                        CFSetAddValue(insertedNames, unsafeBitCast(name, to: UnsafeRawPointer.self))
+                    }
+                default:
+                    break
+                }
+            }
+            
+            let key: CFString = CFStringCreateWithCString(
+                kCFAllocatorDefault,
+                ToolchainPackageManager.insertedNamesKey,
+                CFStringBuiltInEncodings.UTF8.rawValue
+            )
+            
+            CFDictionarySetValue(
+                userInfo,
+                unsafeBitCast(key, to: UnsafeRawPointer.self),
+                unsafeBitCast(insertedNames, to: UnsafeRawPointer.self)
+            )
+        }
+        
+        //
+        
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetLocalCenter(),
+            .init(
+                rawValue: CFStringCreateWithCString(
+                    kCFAllocatorDefault,
+                    ToolchainPackageManager.getDidChangeDownloadingProgressesNotificationName(),
+                    CFStringBuiltInEncodings.UTF8.rawValue
+                )
+            ),
+            Unmanaged<ToolchainPackageManager>.passUnretained(self).toOpaque(),
+            userInfo,
+            .init(true)
+        )
     }
 }

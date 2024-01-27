@@ -16,7 +16,7 @@ __attribute__((objc_direct_members))
 @property (retain, nonatomic) NSManagedObjectContext * _Nullable childManagedObjectContext;
 @property (retain, nonatomic) NSFetchedResultsController<NSManagedObject *> *fetchedResultsController;
 @property (retain, nonatomic, readonly) dispatch_queue_t queue;
-@property (assign, atomic) BOOL requestedLoading;
+@property (assign, atomic) BOOL isLoading;
 @end
 
 @implementation ToolchainsViewModel
@@ -45,12 +45,12 @@ __attribute__((objc_direct_members))
 
 - (void)loadDataSourceWithToolchainCategory:(NSString *)toolchainCategory searchText:(NSString * _Nullable)searchText completionHandler:(void (^)(NSError * _Nullable error))completionHandler {
     dispatch_async(self.queue, ^{
-        if (self.requestedLoading) {
+        if (self.isLoading) {
             completionHandler(nil);
             return;
         }
         
-        self.requestedLoading = YES;
+        self.isLoading = YES;
         
         //
         
@@ -62,11 +62,12 @@ __attribute__((objc_direct_members))
             [fetchedResultsController performFetch:&error];
             completionHandler(error);
             
-            self.requestedLoading = NO;
+            self.isLoading = NO;
         } else {
             SwainCore::ToolchainDataManager::getSharedInstance().managedObjectContext(^(NSManagedObjectContext * _Nullable managedObjectContext, NSError * _Nullable error) {
                 if (error) {
                     completionHandler(error);
+                    self.isLoading = NO;
                     return;
                 }
                 
@@ -90,7 +91,7 @@ __attribute__((objc_direct_members))
                     [fetchedResultsController performFetch:&error];
                     completionHandler(error);
                     
-                    self.requestedLoading = NO;
+                    self.isLoading = NO;
                 });
             });
         }

@@ -1,11 +1,11 @@
 //
-//  getStdStringFromSwiftString.cpp
+//  getStringFromSwiftString.cpp
 //  Swain
 //
 //  Created by Jinwoo Kim on 1/25/24.
 //
 
-#import "getStdStringFromSwiftString.hpp"
+#import "getStringFromSwiftString.hpp"
 #include <ranges>
 #include <string>
 

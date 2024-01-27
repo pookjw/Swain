@@ -16,6 +16,7 @@
     self.preferredMaxLayoutWidth = 0.f;
     self.lineBreakMode = NSLineBreakByWordWrapping;
     self.drawsBackground = NO;
+    self.textColor = NSColor.controlTextColor;
 }
 
 @end

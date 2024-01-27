@@ -6,20 +6,15 @@
 //
 
 #import "ToolchainsCollectionViewItem.hpp"
-#import "NSTextField+ApplyLabelStyle.hpp"
 #import "NSView+Private.h"
-#import "getStdStringFromSwiftString.hpp"
+#import "getStringFromSwiftString.hpp"
+#import "NSTextField+ApplyLabelStyle.hpp"
 #import <CoreFoundation/CoreFoundation.h>
 #import <objc/message.h>
 @import SwainCore;
 
 namespace ns_ToolchainsCollectionViewItem {
     NSUserInterfaceItemIdentifier const identifier = NSStringFromClass(ToolchainsCollectionViewItem.class);
-void callback(CFNotificationCenterRef center, void *observer, CFNotificationName name, const void *object, CFDictionaryRef userInfo) {
-    auto item = [[reinterpret_cast<ToolchainsCollectionViewItem *>(object) retain] autorelease];
-    
-    
-}
 }
 
 __attribute__((objc_direct_members))
@@ -55,14 +50,6 @@ __attribute__((objc_direct_members))
 }
 
 - (void)dealloc {
-    void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
-    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
-    
-    CFNotificationCenterRemoveObserver(CFNotificationCenterGetLocalCenter(),
-                                       self,
-                                       cfString,
-                                       object);
-    
     [_stackView release];
     [_downloadButton release];
     [_managedObjectID release];
@@ -70,23 +57,7 @@ __attribute__((objc_direct_members))
 }
 
 - (void)commonInit_ToolchainsCollectionViewItem __attribute__((objc_direct)) {
-    void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
-    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
     
-    CFNotificationCenterAddObserver(CFNotificationCenterGetLocalCenter(),
-                                    self,
-                                    ns_ToolchainsCollectionViewItem::callback,
-                                    cfString,
-                                    object,
-                                    CFNotificationSuspensionBehaviorDeliverImmediately);
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if ([keyPath isEqualToString:@"completedUnitCount"]) {
-        NSLog(@"%f", reinterpret_cast<NSProgress *>(object).fractionCompleted);
-    } else {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-    }
 }
 
 - (void)setSelected:(BOOL)selected {
@@ -102,8 +73,7 @@ __attribute__((objc_direct_members))
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    NSTextField *textField = [[NSTextField alloc] initWithFrame:self.view.bounds];
-    textField.textColor = NSColor.controlTextColor;
+    NSTextField *textField = [NSTextField labelWithString:[NSString string]];
     [textField applyLabelStyle];
     
     NSStackView *stackView = self.stackView;
@@ -121,7 +91,6 @@ __attribute__((objc_direct_members))
     ]];
     
     self.textField = textField;
-    [textField release];
 }
 
 - (void)prepareForReuse {
@@ -188,7 +157,7 @@ __attribute__((objc_direct_members))
             ToolchainPackageManager::getSharedInstance().download([name cStringUsingEncoding:NSUTF8StringEncoding],
                                                                   [category cStringUsingEncoding:NSUTF8StringEncoding],
                                                                   ^(NSProgress *progress) {
-                [progress addObserver:self forKeyPath:@"completedUnitCount" options:NSKeyValueObservingOptionNew context:NULL];
+                NSLog(@"%@", progress);
             },
                                                                   ^(NSURL * _Nullable url, NSError * _Nullable error) {
                 assert(!error);

@@ -9,15 +9,10 @@
 #import "MainSidebarViewController.hpp"
 #import "ToolchainsViewController.hpp"
 #import "ToolchainInspectorViewController.hpp"
+#import "getStringFromSwiftString.hpp"
+#import "DownloadingToolchainsViewController.hpp"
 #import <objc/message.h>
 @import SwainCore;
-
-namespace ns_MainWindow {
-    const NSToolbarIdentifier toolbarIdentifier = @"MainWindowToolbarIdentifier";
-    const NSToolbarItemIdentifier swiftToolbarItemIdentifier = @"MainWindowSwiftToolbarItemIdentifier";
-    const NSToolbarItemIdentifier reloadToolbarItemIdentifier = @"MainWindowReloadToolbarItemIdentifier";
-    const NSToolbarItemIdentifier searchToolbarItemIdentifier = @"MainWindowSearchToolbarItemIdentifier";
-}
 
 __attribute__((objc_direct_members))
 @interface MainWindow () <NSToolbarDelegate, MainSidebarViewControllerDelegate> {
@@ -41,12 +36,31 @@ __attribute__((objc_direct_members))
 @property (retain, nonatomic, readonly) ToolchainInspectorViewController *toolchainInspectorViewController;
 @property (retain, nonatomic) NSProgress * _Nullable reloadProgress;
 @property (retain, nonatomic, readonly) NSString * _Nullable searchText;
+- (void)downloadingProgressesDidChange;
 @end
+
+namespace ns_MainWindow {
+    const NSToolbarIdentifier toolbarIdentifier = @"MainWindowToolbarIdentifier";
+    const NSToolbarItemIdentifier swiftToolbarItemIdentifier = @"MainWindowSwiftToolbarItemIdentifier";
+    const NSToolbarItemIdentifier reloadToolbarItemIdentifier = @"MainWindowReloadToolbarItemIdentifier";
+    const NSToolbarItemIdentifier searchToolbarItemIdentifier = @"MainWindowSearchToolbarItemIdentifier";
+    const NSToolbarItemIdentifier downloadingToolchainsItemIdentifier = @"MainWindowDownloadingToolchainsItemIdentifier";
+
+    void downloadingProgressesDidChangeCallback(CFNotificationCenterRef center,
+                                                void *observer,
+                                                CFNotificationName name,
+                                                const void *object,
+                                                CFDictionaryRef userInfo)
+    {
+        auto mainWindow = reinterpret_cast<MainWindow *>(object);
+        [mainWindow downloadingProgressesDidChange];
+    }
+}
 
 @implementation MainWindow
 
 - (instancetype)init {
-    self = [self initWithContentRect:NSMakeRect(0.f, 0.f, 600.f, 400.f)
+    self = [self initWithContentRect:NSMakeRect(0.f, 0.f, 800.f, 600.f)
                             styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable | NSWindowStyleMaskTitled | NSWindowStyleMaskFullSizeContentView
                               backing:NSBackingStoreBuffered
                                 defer:YES];
@@ -63,6 +77,14 @@ __attribute__((objc_direct_members))
 }
 
 - (void)dealloc {
+    void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
+    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
+    
+    CFNotificationCenterRemoveObserver(CFNotificationCenterGetLocalCenter(),
+                                       self,
+                                       cfString,
+                                       object);
+    
     [_splitViewController release];
     [_sidebarSplitViewItem release];
     [_contentListSplitViewItem release];
@@ -92,6 +114,18 @@ __attribute__((objc_direct_members))
     NSViewController *emptyViewController = [NSViewController new];
     [self replaceContentViewController:emptyViewController];
     [emptyViewController release];
+    
+    //
+    
+    void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
+    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
+    
+    CFNotificationCenterAddObserver(CFNotificationCenterGetLocalCenter(),
+                                    self,
+                                    ns_MainWindow::downloadingProgressesDidChangeCallback,
+                                    cfString,
+                                    object,
+                                    CFNotificationSuspensionBehaviorDeliverImmediately);
     
     //
     
@@ -224,6 +258,7 @@ __attribute__((objc_direct_members))
     return @[
         ns_MainWindow::swiftToolbarItemIdentifier,
         ns_MainWindow::reloadToolbarItemIdentifier,
+        ns_MainWindow::downloadingToolchainsItemIdentifier,
         ns_MainWindow::searchToolbarItemIdentifier,
         NSToolbarInspectorTrackingSeparatorItemIdentifier,
         NSToolbarFlexibleSpaceItemIdentifier,
@@ -262,6 +297,13 @@ __attribute__((objc_direct_members))
         [self updateReloadToolbarItem:reloadToolbarItem isLoading:NO];
         
         return [reloadToolbarItem autorelease];
+    } else if ([itemIdentifier isEqualToString:ns_MainWindow::downloadingToolchainsItemIdentifier]) {
+        NSToolbarItem *downloadingToolchainsToolbarItem = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
+        downloadingToolchainsToolbarItem.image = [NSImage imageWithSystemSymbolName:@"arrow.down.circle" accessibilityDescription:nil];
+        downloadingToolchainsToolbarItem.target = self;
+        downloadingToolchainsToolbarItem.action = @selector(downloadingToolchainsToolbarItemDidTrigger:);
+        
+        return [downloadingToolchainsToolbarItem autorelease];
     } else if ([itemIdentifier isEqualToString:ns_MainWindow::searchToolbarItemIdentifier]) {
         NSSearchToolbarItem *searchToolbarItem = [[NSSearchToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
         searchToolbarItem.target = self;
@@ -310,6 +352,24 @@ __attribute__((objc_direct_members))
     if (auto currentToolchainsViewController = self.currentToolchainsViewController) {
         currentToolchainsViewController.searchText = sender.stringValue;
     }
+}
+
+- (void)downloadingToolchainsToolbarItemDidTrigger:(NSToolbarItem *)sender {
+    DownloadingToolchainsViewController *contentViewController = [DownloadingToolchainsViewController new];
+    NSPopover *popover = [NSPopover new];
+    
+    popover.contentViewController = contentViewController;
+    [contentViewController release];
+    
+    popover.behavior = NSPopoverBehaviorApplicationDefined;
+    popover.contentSize = NSMakeSize(600.f, 400.f);
+    
+    [popover showRelativeToToolbarItem:sender];
+    [popover release];
+}
+
+- (void)downloadingProgressesDidChange __attribute__((objc_direct)) {
+    
 }
 
 - (NSString *)searchText {
