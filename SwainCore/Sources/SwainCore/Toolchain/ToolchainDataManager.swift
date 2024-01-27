@@ -39,7 +39,7 @@ public actor ToolchainDataManager {
             
             let url: URL = .applicationSupportDirectory
                 .appending(path: "SwainCore", directoryHint: .isDirectory)
-                .appending(component: "Toolchain", directoryHint: .notDirectory)
+                .appending(component: "SwainCore", directoryHint: .notDirectory)
                 .appendingPathExtension("sqlite")
             
             let configuration: ModelConfiguration = .init(

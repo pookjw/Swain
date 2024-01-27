@@ -131,7 +131,7 @@
       "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
         "branch" : "main",
-        "revision" : "911284b3c63c1a9dd5ee47a54aa7bec84cc4cd24"
+        "revision" : "0fb0018518c9a4b3049fdcc5b705d050ef35c546"
       }
     },
     {
@@ -149,7 +149,7 @@
       "location" : "https://github.com/apple/swift-testing.git",
       "state" : {
         "branch" : "main",
-        "revision" : "74de1e0bb07d48cb28617f2dbcaf114261a18a6b"
+        "revision" : "ccdf06c14251e99f8fac121943a903dcf558e850"
       }
     }
   ],

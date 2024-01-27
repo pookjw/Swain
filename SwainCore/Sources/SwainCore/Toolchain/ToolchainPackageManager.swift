@@ -17,6 +17,10 @@ extension ProgressUserInfoKey {
     public static var toolchainNameKey: ProgressUserInfoKey {
         .init("toolchainName")
     }
+    
+    public static var cancelReasonErrorKey: ProgressUserInfoKey {
+        .init("cancelReasonError")
+    }
 }
 
 @globalActor
@@ -40,6 +44,10 @@ public actor ToolchainPackageManager {
         ProgressUserInfoKey.toolchainNameKey.rawValue
     }
     
+    public static nonisolated var cancelReasonErrorProgressUserInfoKey: String {
+        ProgressUserInfoKey.cancelReasonErrorKey.rawValue
+    }
+    
     public static nonisolated var deletedNamesKey: String {
         "deletedNamesKey"
     }
@@ -56,7 +64,7 @@ public actor ToolchainPackageManager {
     
     private let downloadsURL: URL = .applicationSupportDirectory
         .appending(path: "SwainCore", directoryHint: .isDirectory)
-        .appending(path: "Downloads", directoryHint: .isDirectory)
+        .appending(path: "ToolchainPackages", directoryHint: .isDirectory)
     
     private init() {
         
@@ -267,6 +275,13 @@ extension ToolchainPackageManager {
             
             let progress: Progress = .init(totalUnitCount: contentLength)
             progress.setUserInfoObject(name, forKey: .toolchainNameKey)
+            
+            progress.cancellationHandler = {
+                client.shutdown { _ in
+                    
+                }
+            }
+            
             _progress = progress
             
             downloadingProgresses.append(progress)
@@ -301,7 +316,10 @@ extension ToolchainPackageManager {
             
             return destinationURL
         } catch {
-            if _progress == nil {
+            if let _progress: Progress {
+                _progress.setUserInfoObject(error, forKey: .cancelReasonErrorKey)
+                _progress.cancel()
+            } else {
                 let progress: Progress = .init(totalUnitCount: 1)
                 progress.cancel()
                 progressHandler(progress)
