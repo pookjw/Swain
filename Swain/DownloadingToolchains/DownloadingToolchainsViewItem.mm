@@ -11,17 +11,23 @@
 
 namespace ns_DownloadingToolchainsViewItem {
     NSUserInterfaceItemIdentifier const identifier = NSStringFromClass(DownloadingToolchainsViewItem.class);
+    void *isDownloadingContext = &isDownloadingContext;
 };
 
 __attribute__((objc_direct_members))
 @interface DownloadingToolchainsViewItem () {
-    NSStackView *_stackView;
-    NSTextField *_dt_textField;
+    NSStackView *_verticalStackView;
+    NSStackView *_horizontalStackView;
+    NSTextField *_nameTextField;
     NSProgressIndicator *_progressIndicator;
+    NSButton *_openButton;
 }
-@property (retain, nonatomic, readonly) NSStackView *stackView;
+@property (retain, nonatomic, readonly) NSStackView *verticalStackView;
+@property (retain, nonatomic, readonly) NSStackView *horizontalStackView;
 @property (retain, nonatomic, readonly) NSProgressIndicator *progressIndicator;
-@property (retain, nonatomic, readonly) NSTextField *dt_textField;
+@property (retain, nonatomic, readonly) NSTextField *nameTextField;
+@property (retain, nonatomic, readonly) NSButton *openButton;
+@property (retain, nonatomic) DownloadingToolchainsViewItemModel * _Nullable itemModel;
 @end
 
 @implementation DownloadingToolchainsViewItem
@@ -31,67 +37,105 @@ __attribute__((objc_direct_members))
 }
 
 - (void)dealloc {
-    [_stackView release];
-    [_dt_textField release];
+    [_verticalStackView release];
+    [_horizontalStackView release];
+    [_nameTextField release];
     [_progressIndicator release];
+    [_openButton release];
+    
+    [self removeIsDownloadingObserver];
+    [_itemModel release];
+    
     [super dealloc];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (context == ns_DownloadingToolchainsViewItem::isDownloadingContext) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateAttributes];
+        });
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
+- (void)setItemModel:(DownloadingToolchainsViewItemModel *)itemModel {
+    [self removeIsDownloadingObserver];
+    [_itemModel release];
+    _itemModel = [itemModel retain];
+    
+    [itemModel.toolchainPackage addObserver:self forKeyPath:@"isDownloading" options:NSKeyValueObservingOptionNew context:ns_DownloadingToolchainsViewItem::isDownloadingContext];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    NSStackView *stackView = self.stackView;
-    NSTextField *dt_textField = self.dt_textField;
+    NSStackView *verticalStackView = self.verticalStackView;
+    NSStackView *horizontalStackView = self.horizontalStackView;
+    NSTextField *nameTextField = self.nameTextField;
+    NSButton *openButton = self.openButton;
     NSProgressIndicator *progressIndicator = self.progressIndicator;
     
-    [self.view addSubview:stackView];
-    [stackView addArrangedSubview:dt_textField];
-    [stackView addArrangedSubview:progressIndicator];
+    [self.view addSubview:verticalStackView];
+    [verticalStackView addArrangedSubview:horizontalStackView];
+    [horizontalStackView addArrangedSubview:nameTextField];
+    [horizontalStackView addArrangedSubview:openButton];
+    [verticalStackView addArrangedSubview:progressIndicator];
     
-    stackView.translatesAutoresizingMaskIntoConstraints = NO;
+    verticalStackView.translatesAutoresizingMaskIntoConstraints = NO;
     
-    [self.view addSubview:stackView];
+    [self.view addSubview:verticalStackView];
     [NSLayoutConstraint activateConstraints:@[
-        [stackView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-        [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-        [stackView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
+        [verticalStackView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+        [verticalStackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [verticalStackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [verticalStackView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
     ]];
 }
 
-- (void)prepareForReuse {
-    [super prepareForReuse];
-}
-
 - (void)loadWithItemModel:(DownloadingToolchainsViewItemModel *)itemModel {
-    self.dt_textField.stringValue = itemModel.name;
-    self.progressIndicator.observedProgress = itemModel.progress;
+    self.itemModel = itemModel;
+    [self updateAttributes];
 }
 
-- (NSStackView *)stackView {
-    if (auto stackView = _stackView) return stackView;
+- (NSStackView *)horizontalStackView {
+    if (auto horizontalStackView = _horizontalStackView) return horizontalStackView;
     
-    NSStackView *stackView = [[NSStackView alloc] initWithFrame:self.view.bounds];
-    stackView.orientation = NSUserInterfaceLayoutOrientationVertical;
-    stackView.alignment = NSLayoutAttributeLeading;
-    stackView.distribution = NSStackViewDistributionFillProportionally;
-    stackView.spacing = 8.f;
-    stackView.edgeInsets = NSEdgeInsetsMake(8.f, 8.f, 8.f, 8.f);
+    NSStackView *horizontalStackView = [[NSStackView alloc] initWithFrame:self.view.bounds];
+    horizontalStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
+//    horizontalStackView.alignment = ㅜ;
+    horizontalStackView.distribution = NSStackViewDistributionFillProportionally;
+    horizontalStackView.spacing = 8.f;
+    horizontalStackView.edgeInsets = NSEdgeInsetsMake(8.f, 8.f, 8.f, 8.f);
     
-    _stackView = [stackView retain];
-    return [stackView autorelease];
+    _horizontalStackView = [horizontalStackView retain];
+    return [horizontalStackView autorelease];
 }
 
-- (NSTextField *)dt_textField {
-    if (auto dt_textField = _dt_textField) return dt_textField;
+- (NSStackView *)verticalStackView {
+    if (auto verticalStackView = _verticalStackView) return verticalStackView;
     
-    NSTextField *dt_textField = [NSTextField labelWithString:[NSString string]];
-    [dt_textField applyLabelStyle];
+    NSStackView *verticalStackView = [[NSStackView alloc] initWithFrame:self.view.bounds];
+    verticalStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
+    verticalStackView.alignment = NSLayoutAttributeLeading;
+    verticalStackView.distribution = NSStackViewDistributionFillProportionally;
+    verticalStackView.spacing = 8.f;
+    verticalStackView.edgeInsets = NSEdgeInsetsMake(8.f, 8.f, 8.f, 8.f);
     
-    self.textField = dt_textField;
-    _dt_textField = [dt_textField retain];
+    _verticalStackView = [verticalStackView retain];
+    return [verticalStackView autorelease];
+}
+
+- (NSTextField *)nameTextField {
+    if (auto nameTextField = _nameTextField) return nameTextField;
     
-    return [dt_textField autorelease];
+    NSTextField *nameTextField = [NSTextField labelWithString:[NSString string]];
+    [nameTextField applyLabelStyle];
+    
+    self.textField = nameTextField;
+    _nameTextField = [nameTextField retain];
+    
+    return [nameTextField autorelease];
 }
 
 - (NSProgressIndicator *)progressIndicator {
@@ -106,6 +150,44 @@ __attribute__((objc_direct_members))
     
     _progressIndicator = [progressIndicator retain];
     return [progressIndicator autorelease];
+}
+
+- (NSButton *)openButton {
+    if (auto openButton = _openButton) return openButton;
+    
+    NSButton *openButton = [NSButton buttonWithImage:[NSImage imageWithSystemSymbolName:@"folder.fill" accessibilityDescription:nil]
+                                              target:self
+                                              action:@selector(openButtonDidTrigger:)];
+    
+    openButton.bezelStyle = NSBezelStyleCircular;
+    
+    _openButton = [openButton retain];
+    return openButton;
+}
+
+- (void)removeIsDownloadingObserver __attribute__((objc_direct)) {
+    if (auto toolchainPackage = _itemModel.toolchainPackage) {
+        [toolchainPackage removeObserver:self forKeyPath:@"isDownloading" context:ns_DownloadingToolchainsViewItem::isDownloadingContext];
+    }
+}
+
+- (void)updateAttributes __attribute__((objc_direct)) {
+    self.nameTextField.stringValue = self.itemModel.toolchainPackage.name;
+    self.progressIndicator.observedProgress = self.itemModel.toolchainPackage.downloadingProgress;
+    
+    if (self.itemModel.toolchainPackage.isDownloading) {
+        self.progressIndicator.hidden = NO;
+        self.openButton.hidden = YES;
+    } else {
+        self.progressIndicator.hidden = YES;
+        self.openButton.hidden = NO;
+    }
+}
+
+- (void)openButtonDidTrigger:(NSButton *)sender {
+    if (auto downloadedURL = self.itemModel.toolchainPackage.downloadedURL) {
+        [NSWorkspace.sharedWorkspace openURL:downloadedURL];
+    }
 }
 
 @end

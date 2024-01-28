@@ -1,6 +1,6 @@
 //
 //  ToolchainPackageManager.swift
-//  
+//
 //
 //  Created by Jinwoo Kim on 1/21/24.
 //
@@ -36,8 +36,8 @@ public actor ToolchainPackageManager {
         .shared
     }
     
-    public static nonisolated func getDidChangeDownloadingProgressesNotificationName() -> String {
-        "ToolchainPackageManagerDidChangeDownloadingProgresses"
+    public static nonisolated func getDidChangeToolchainPackagesNotificationName() -> String {
+        "ToolchainPackageManagerDidChangeToolchainPackagesNotificationName"
     }
     
     public static nonisolated var toolchainNameProgressUserInfoKey: String {
@@ -56,9 +56,12 @@ public actor ToolchainPackageManager {
         "insertedNamesKey"
     }
     
-    public private(set) var downloadingProgresses: [Progress] = [] {
+    public private(set) var toolchainPackages: [ToolchainPackage] {
         didSet {
-            postNotificationForDonwloadingProgressesChanges(oldValue: oldValue, newValue: downloadingProgresses)
+            postNotificationForToolchainPackagesChanges(
+                oldValue: oldValue,
+                newValue: toolchainPackages
+            )
         }
     }
     
@@ -67,7 +70,7 @@ public actor ToolchainPackageManager {
         .appending(path: "ToolchainPackages", directoryHint: .isDirectory)
     
     private init() {
-        
+        toolchainPackages = []
     }
     
     public func downloadedURL(for toolchain: Toolchain) async -> URL? {
@@ -98,23 +101,23 @@ public actor ToolchainPackageManager {
         return url
     }
     
-    public nonisolated func getDownloadingProgresses(completionHandler: UnsafeRawPointer) {
-        typealias BlockType = @convention(block) @Sendable ([Progress]) -> Void
+    public nonisolated func getToolchainPackages(completionHandler: UnsafeRawPointer) {
+        typealias BlockType = @convention(block) @Sendable ([ToolchainPackage]) -> Void
         
-        let copiedBlock: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as! AnyObject
+        let copiedBlock: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as AnyObject
         
         Task {
             let castedBlock: BlockType = unsafeBitCast(copiedBlock, to: BlockType.self)
-            let downloadingProgresses: [Progress] = await downloadingProgresses
-            castedBlock(downloadingProgresses)
+            let toolchainPackages: [ToolchainPackage] = await toolchainPackages
+            
+            castedBlock(toolchainPackages)
         }
     }
     
-    public nonisolated func downloadedURL(for name: String, completionHandler: UnsafeRawPointer) {
+    public nonisolated func getDownloadedURL(for name: String, completionHandler: UnsafeRawPointer) {
         typealias BlockType = @convention(block) @Sendable (URL?) -> Void
         
-        let copiedBlock: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as! AnyObject
-        let name: String = unsafeBitCast(name, to: String.self)
+        let copiedBlock: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as AnyObject
         
         Task {
             let castedBlock: BlockType = unsafeBitCast(copiedBlock, to: BlockType.self)
@@ -159,7 +162,7 @@ public actor ToolchainPackageManager {
         }
     }
 }
- 
+
 extension ToolchainPackageManager {
     private nonisolated func destinationURL(name: String) -> URL {
         downloadsURL
@@ -231,6 +234,8 @@ extension ToolchainPackageManager {
         if let downloadedURL: URL = downloadedURL(name: name) {
             let progress: Progress = .init(totalUnitCount: 1)
             progress.completedUnitCount = 1
+            
+            toolchainPackages.append(.init(name: name, createdDate: .now, state: .downloaded(downloadedURL)))
             progressHandler(progress)
             return downloadedURL
         }
@@ -284,12 +289,18 @@ extension ToolchainPackageManager {
             
             _progress = progress
             
-            downloadingProgresses.append(progress)
+            let toolchainPackage: ToolchainPackage = .init(
+                name: name,
+                createdDate: .now,
+                state: .downloading(progress)
+            )
+            
+            toolchainPackages.append(toolchainPackage)
             progressHandler(progress)
             
             let file: UnsafeMutablePointer<FILE> = fopen(destinationTmpURL.path(percentEncoded: false).cString(using: .utf8), "a+")
             _file = file
-
+            
             for try await buffer in response.body {
                 try Task.checkCancellation()
                 
@@ -314,6 +325,8 @@ extension ToolchainPackageManager {
             )
             assert(renameResult == .zero)
             
+            toolchainPackage.state = .downloaded(destinationURL)
+            
             return destinationURL
         } catch {
             if let _progress: Progress {
@@ -337,10 +350,13 @@ extension ToolchainPackageManager {
         }
     }
     
-    private func postNotificationForDonwloadingProgressesChanges(oldValue: [Progress], newValue: [Progress]) {
+    private func postNotificationForToolchainPackagesChanges(
+        oldValue: [ToolchainPackage],
+        newValue: [ToolchainPackage]
+    ) {
         guard oldValue != newValue else { return }
         
-        let difference: CollectionDifference<Progress> = newValue.difference(from: oldValue)
+        let difference: CollectionDifference<ToolchainPackage> = newValue.difference(from: oldValue)
         guard !difference.isEmpty else { return }
         
         let userInfo: CFMutableDictionary = withUnsafePointer(to: kCFTypeDictionaryKeyCallBacks) { p1 in
@@ -356,7 +372,7 @@ extension ToolchainPackageManager {
         
         //
         
-        let removals: [CollectionDifference<Progress>.Change] = difference.removals
+        let removals: [CollectionDifference<ToolchainPackage>.Change] = difference.removals
         if !removals.isEmpty {
             let deletedNames: CFMutableSet = withUnsafePointer(to: kCFTypeSetCallBacks) { p in
                 CFSetCreateMutable(kCFAllocatorDefault, removals.count, p)
@@ -365,15 +381,13 @@ extension ToolchainPackageManager {
             for removal in removals {
                 switch removal {
                 case .remove(let offset, let element, let associatedWith):
-                    if let name: String = element.userInfo[.toolchainNameKey] as? String {
-                        let name: CFString = CFStringCreateWithCString(
-                            kCFAllocatorDefault,
-                            name,
-                            CFStringBuiltInEncodings.UTF8.rawValue
-                        )
-                        
-                        CFSetAddValue(deletedNames, unsafeBitCast(name, to: UnsafeRawPointer.self))
-                    }
+                    let name: CFString = CFStringCreateWithCString(
+                        kCFAllocatorDefault,
+                        element.name,
+                        CFStringBuiltInEncodings.UTF8.rawValue
+                    )
+                    
+                    CFSetAddValue(deletedNames, unsafeBitCast(name, to: UnsafeRawPointer.self))
                 default:
                     break
                 }
@@ -394,7 +408,7 @@ extension ToolchainPackageManager {
         
         //
         
-        let insertions: [CollectionDifference<Progress>.Change] = difference.insertions
+        let insertions: [CollectionDifference<ToolchainPackage>.Change] = difference.insertions
         if !insertions.isEmpty {
             let insertedNames: CFMutableSet = withUnsafePointer(to: kCFTypeSetCallBacks) { p in
                 CFSetCreateMutable(kCFAllocatorDefault, insertions.count, p)
@@ -403,15 +417,13 @@ extension ToolchainPackageManager {
             for insertion in insertions {
                 switch insertion {
                 case .insert(let offset, let element, let associatedWith):
-                    if let name: String = element.userInfo[.toolchainNameKey] as? String {
-                        let name: CFString = CFStringCreateWithCString(
-                            kCFAllocatorDefault,
-                            name,
-                            CFStringBuiltInEncodings.UTF8.rawValue
-                        )
-                        
-                        CFSetAddValue(insertedNames, unsafeBitCast(name, to: UnsafeRawPointer.self))
-                    }
+                    let name: CFString = CFStringCreateWithCString(
+                        kCFAllocatorDefault,
+                        element.name,
+                        CFStringBuiltInEncodings.UTF8.rawValue
+                    )
+                    
+                    CFSetAddValue(insertedNames, unsafeBitCast(name, to: UnsafeRawPointer.self))
                 default:
                     break
                 }
@@ -437,7 +449,7 @@ extension ToolchainPackageManager {
             .init(
                 rawValue: CFStringCreateWithCString(
                     kCFAllocatorDefault,
-                    ToolchainPackageManager.getDidChangeDownloadingProgressesNotificationName(),
+                    ToolchainPackageManager.getDidChangeToolchainPackagesNotificationName(),
                     CFStringBuiltInEncodings.UTF8.rawValue
                 )
             ),

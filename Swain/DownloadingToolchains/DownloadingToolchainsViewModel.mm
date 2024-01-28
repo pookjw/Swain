@@ -7,6 +7,7 @@
 
 #import "DownloadingToolchainsViewModel.hpp"
 #import "getStringFromSwiftString.hpp"
+#import <objc/message.h>
 @import SwainCore;
 
 __attribute__((objc_direct_members))
@@ -66,22 +67,17 @@ namespace ns_DownloadingToolchainsViewModel {
         
         self.isLoading = YES;
         
-        SwainCore::ToolchainPackageManager::getSharedInstance().getDownloadingProgresses(^(NSArray<NSProgress *> *progresses) {
-            dispatch_async(self.queue, ^{
-                auto snapshot = [NSDiffableDataSourceSnapshot<NSNumber *, DownloadingToolchainsViewItemModel *> new];
-                
-                NSNumber *firstSection = @0;
-                [snapshot appendSectionsWithIdentifiers:@[firstSection]];
-                
-                NSString *toolchainNameProgressUserInfoKey = SwainCore::ToolchainPackageManager::getToolchainNameProgressUserInfoKey();
-                
+        SwainCore::ToolchainPackageManager::getSharedInstance().getToolchainPackages(^(NSArray<SWCToolchainPackage *> *toolchainPackages) {
+            auto snapshot = [NSDiffableDataSourceSnapshot<NSNumber *, DownloadingToolchainsViewItemModel *> new];
+            
+            NSNumber *firstSection = @0;
+            [snapshot appendSectionsWithIdentifiers:@[firstSection]];
+            
+            if (toolchainPackages.count > 0) {
                 auto itemModels = [NSMutableArray<DownloadingToolchainsViewItemModel *> new];
                 
-                [progresses enumerateObjectsUsingBlock:^(NSProgress * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                    NSString *toolchainName = obj.userInfo[toolchainNameProgressUserInfoKey];
-                    if (toolchainName == nil) return;
-                    
-                    DownloadingToolchainsViewItemModel *itemModel = [[DownloadingToolchainsViewItemModel alloc] initWithName:toolchainName progress:obj];
+                [toolchainPackages enumerateObjectsUsingBlock:^(SWCToolchainPackage * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    DownloadingToolchainsViewItemModel *itemModel = [[DownloadingToolchainsViewItemModel alloc] initWitToolchainPackage:obj];
                     
                     [itemModels addObject:itemModel];
                     [itemModel release];
@@ -89,11 +85,11 @@ namespace ns_DownloadingToolchainsViewModel {
                 
                 [snapshot appendItemsWithIdentifiers:itemModels intoSectionWithIdentifier:firstSection];
                 [itemModels release];
-                
-                [dataSource applySnapshot:snapshot animatingDifferences:YES];
-                completionHandler();
-                self.isLoading = NO;
-            });
+            }
+            
+            [dataSource applySnapshot:snapshot animatingDifferences:YES];
+            completionHandler();
+            self.isLoading = NO;
         });
     });
 }
@@ -110,7 +106,7 @@ namespace ns_DownloadingToolchainsViewModel {
 
 - (void)observeDownloadingProgressesDidChange __attribute__((objc_direct)) {
     void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
-    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
+    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeToolchainPackagesNotificationName());
     
     CFNotificationCenterAddObserver(CFNotificationCenterGetLocalCenter(),
                                     self,
@@ -122,7 +118,7 @@ namespace ns_DownloadingToolchainsViewModel {
 
 - (void)removeDownloadingProgressesDidChangeObserver __attribute__((objc_direct)) {
     void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
-    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
+    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeToolchainPackagesNotificationName());
     
     CFNotificationCenterRemoveObserver(CFNotificationCenterGetLocalCenter(),
                                        self,

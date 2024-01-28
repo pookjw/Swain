@@ -8,54 +8,73 @@
 import Foundation
 import FoundationPreview
 
-public struct ToolchainPackage: Hashable, Identifiable, Sendable {
-    public var id: String { name }
-    
-    public enum State: Hashable, Identifiable, Sendable {
-        public var id: Int {
-            hashValue
-        }
-        
+@objc(SWCToolchainPackage)
+public final class ToolchainPackage: NSObject, @unchecked Sendable {
+    public enum State: Hashable, Sendable {
         case downloading(Progress)
         case downloaded(Foundation.URL)
     }
     
-    public let name: String
+    @objc public let name: String
     
     public let createdDate: FoundationEssentials.Date
-    public var createdDateRef: UnsafeRawPointer {
-        let nsDate: NSDate = .init(timeIntervalSinceReferenceDate: createdDate.timeIntervalSinceReferenceDate)
-        return unsafeBitCast(nsDate, to: UnsafeRawPointer.self)
+    
+    @objc(createdDate) public var createdNSDate: NSDate {
+        .init(timeIntervalSinceReferenceDate: createdDate.timeIntervalSinceReferenceDate)
     }
     
-    public let state: State
+    public internal(set) var state: State {
+        willSet {
+            if state != newValue {
+                willChangeValue(for: \.isDownloading)
+                willChangeValue(for: \.downloadingProgress)
+                willChangeValue(for: \.downloadedURL)
+            }
+        }
+        didSet {
+            if oldValue != state {
+                didChangeValue(for: \.isDownloading)
+                didChangeValue(for: \.downloadingProgress)
+                didChangeValue(for: \.downloadedURL)
+            }
+        }
+    }
     
-    public var isDownloading: Bool {
+    @objc public var isDownloading: Bool {
         switch state {
-        case .downloading(let progress):
+        case .downloading:
             true
         default:
             false
         }
     }
     
-    public var downloadingProgressRef: UnsafeRawPointer? {
+    @objc public var downloadingProgress: Progress? {
         switch state {
         case .downloading(let progress):
-            return .init(Unmanaged<Progress>.passUnretained(progress).toOpaque())
+            return progress
         default:
             return nil
         }
     }
     
-    public var downloadedURLRef: UnsafeRawPointer? {
+    @objc public var downloadedURL: Foundation.URL? {
         switch state {
         case .downloaded(let url):
-            return .init(Unmanaged<NSURL>.passUnretained(url as NSURL).toOpaque())
+            return url
         default:
             return nil
         }
     }
+    
+    public override var hash: Int {
+        name.hash
+    }
+    
+    init(name: String, createdDate: FoundationEssentials.Date, state: State) {
+        self.name = name
+        self.createdDate = createdDate
+        self.state = state
+        super.init()
+    }
 }
-
-public func foo() -> ToolchainPackage { fatalError() }

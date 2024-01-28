@@ -9,24 +9,21 @@
 
 __attribute__((objc_direct_members))
 @interface DownloadingToolchainsViewItemModel ()
-@property (copy, nonatomic) NSString *name;
-@property (retain, nonatomic) NSProgress *progress;
+@property (retain, nonatomic) SWCToolchainPackage *toolchainPackage;
 @end
 
 @implementation DownloadingToolchainsViewItemModel
 
-- (instancetype)initWithName:(NSString *)name progress:(NSProgress *)progress {
+- (instancetype)initWitToolchainPackage:(SWCToolchainPackage *)toolchainPackage {
     if (self = [super init]) {
-        self.name = name;
-        self.progress = progress;
+        self.toolchainPackage = toolchainPackage;
     }
     
     return self;
 }
 
 - (void)dealloc {
-    [_name release];
-    [_progress release];
+    [_toolchainPackage release];
     [super dealloc];
 }
 

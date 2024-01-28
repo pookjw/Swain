@@ -78,7 +78,7 @@ namespace ns_MainWindow {
 
 - (void)dealloc {
     void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
-    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
+    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeToolchainPackagesNotificationName());
     
     CFNotificationCenterRemoveObserver(CFNotificationCenterGetLocalCenter(),
                                        self,
@@ -118,7 +118,7 @@ namespace ns_MainWindow {
     //
     
     void *object = swift::_impl::_impl_RefCountedClass::getOpaquePointer(SwainCore::ToolchainPackageManager::getSharedInstance());
-    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeDownloadingProgressesNotificationName());
+    CFStringRef cfString = getCFStringFromSwiftString(SwainCore::ToolchainPackageManager::getDidChangeToolchainPackagesNotificationName());
     
     CFNotificationCenterAddObserver(CFNotificationCenterGetLocalCenter(),
                                     self,
