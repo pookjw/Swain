@@ -10,6 +10,13 @@ import FoundationPreview
 
 @objc(SWCToolchainPackage)
 public final class ToolchainPackage: NSObject, @unchecked Sendable {
+    @objc public static let stateKey: String = "state"
+    @objc public static let downloadingState: String = "downloadingState"
+    @objc public static let downloadedState: String = "downloadedState"
+    
+    @objc public static let downloadingProgressKey: String = "downloadingProgress"
+    @objc public static let downloadedURLKey: String = "downloadedURL"
+    
     public enum State: Hashable, Sendable {
         case downloading(Progress)
         case downloaded(Foundation.URL)
@@ -26,49 +33,48 @@ public final class ToolchainPackage: NSObject, @unchecked Sendable {
     public internal(set) var state: State {
         willSet {
             if state != newValue {
-                willChangeValue(for: \.isDownloading)
-                willChangeValue(for: \.downloadingProgress)
-                willChangeValue(for: \.downloadedURL)
+                willChangeValue(for: \.stateInfo)
             }
         }
         didSet {
             if oldValue != state {
-                didChangeValue(for: \.isDownloading)
-                didChangeValue(for: \.downloadingProgress)
-                didChangeValue(for: \.downloadedURL)
+                didChangeValue(for: \.stateInfo)
             }
         }
     }
     
-    @objc public var isDownloading: Bool {
-        switch state {
-        case .downloading:
-            true
-        default:
-            false
-        }
-    }
-    
-    @objc public var downloadingProgress: Progress? {
+    @objc public var stateInfo: [String: Any] {
         switch state {
         case .downloading(let progress):
-            return progress
-        default:
-            return nil
-        }
-    }
-    
-    @objc public var downloadedURL: Foundation.URL? {
-        switch state {
+            return [
+                Self.stateKey: Self.downloadingState,
+                Self.downloadingProgressKey: progress
+            ]
         case .downloaded(let url):
-            return url
-        default:
-            return nil
+            return [
+                Self.stateKey: Self.downloadedState,
+                Self.downloadedURLKey: url
+            ]
         }
     }
     
     public override var hash: Int {
         name.hash
+    }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        if 
+            let objectClass: AnyObject = object as? AnyObject,
+            Unmanaged<AnyObject>.passUnretained(self).toOpaque() == Unmanaged<AnyObject>.passUnretained(objectClass).toOpaque()
+        {
+            return true
+        } else if !super.isEqual(object) {
+            return false
+        } else if let other: ToolchainPackage = object as? ToolchainPackage {
+            return self.name == other.name
+        } else {
+            return false
+        }
     }
     
     init(name: String, createdDate: FoundationEssentials.Date, state: State) {

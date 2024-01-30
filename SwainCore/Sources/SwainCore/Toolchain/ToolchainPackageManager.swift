@@ -73,6 +73,12 @@ public actor ToolchainPackageManager {
         toolchainPackages = []
     }
     
+    public func initialize() {
+        // TODO: NSMetadataQuery
+        
+//        dirent().
+    }
+    
     public func downloadedURL(for toolchain: Toolchain) async -> URL? {
         let name: String = toolchain.name
         return downloadedURL(name: name)

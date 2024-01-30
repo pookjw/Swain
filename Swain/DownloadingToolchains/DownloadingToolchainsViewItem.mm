@@ -11,7 +11,7 @@
 
 namespace ns_DownloadingToolchainsViewItem {
     NSUserInterfaceItemIdentifier const identifier = NSStringFromClass(DownloadingToolchainsViewItem.class);
-    void *isDownloadingContext = &isDownloadingContext;
+    void *stateInfo = &stateInfo;
 };
 
 __attribute__((objc_direct_members))
@@ -50,7 +50,7 @@ __attribute__((objc_direct_members))
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if (context == ns_DownloadingToolchainsViewItem::isDownloadingContext) {
+    if (context == ns_DownloadingToolchainsViewItem::stateInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateAttributes];
         });
@@ -64,7 +64,7 @@ __attribute__((objc_direct_members))
     [_itemModel release];
     _itemModel = [itemModel retain];
     
-    [itemModel.toolchainPackage addObserver:self forKeyPath:@"isDownloading" options:NSKeyValueObservingOptionNew context:ns_DownloadingToolchainsViewItem::isDownloadingContext];
+    [itemModel.toolchainPackage addObserver:self forKeyPath:@"stateInfo" options:NSKeyValueObservingOptionNew context:ns_DownloadingToolchainsViewItem::stateInfo];
 }
 
 - (void)viewDidLoad {
@@ -167,15 +167,15 @@ __attribute__((objc_direct_members))
 
 - (void)removeIsDownloadingObserver __attribute__((objc_direct)) {
     if (auto toolchainPackage = _itemModel.toolchainPackage) {
-        [toolchainPackage removeObserver:self forKeyPath:@"isDownloading" context:ns_DownloadingToolchainsViewItem::isDownloadingContext];
+        [toolchainPackage removeObserver:self forKeyPath:@"stateInfo" context:ns_DownloadingToolchainsViewItem::stateInfo];
     }
 }
 
 - (void)updateAttributes __attribute__((objc_direct)) {
     self.nameTextField.stringValue = self.itemModel.toolchainPackage.name;
-    self.progressIndicator.observedProgress = self.itemModel.toolchainPackage.downloadingProgress;
+    self.progressIndicator.observedProgress = self.itemModel.toolchainPackage.stateInfo[SWCToolchainPackage.downloadingProgressKey];
     
-    if (self.itemModel.toolchainPackage.isDownloading) {
+    if ([self.itemModel.toolchainPackage.stateInfo[SWCToolchainPackage.stateKey] isEqualToString:SWCToolchainPackage.downloadingState]) {
         self.progressIndicator.hidden = NO;
         self.openButton.hidden = YES;
     } else {
@@ -185,7 +185,7 @@ __attribute__((objc_direct_members))
 }
 
 - (void)openButtonDidTrigger:(NSButton *)sender {
-    if (auto downloadedURL = self.itemModel.toolchainPackage.downloadedURL) {
+    if (NSURL *downloadedURL = self.itemModel.toolchainPackage.stateInfo[SWCToolchainPackage.downloadedURLKey]) {
         [NSWorkspace.sharedWorkspace openURL:downloadedURL];
     }
 }
