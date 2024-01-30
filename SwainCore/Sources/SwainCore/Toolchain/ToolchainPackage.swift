@@ -8,42 +8,73 @@
 import Foundation
 import FoundationPreview
 
-public struct ToolchainPackage: Hashable, Sendable {
+@objc(SWCToolchainPackage)
+public final class ToolchainPackage: NSObject, @unchecked Sendable {
     public enum State: Hashable, Sendable {
-        public static func == (lhs: ToolchainPackage.State, rhs: ToolchainPackage.State) -> Bool {
-            switch (lhs, rhs) {
-            case (.downloading(let lhsValue), .downloading(let rhsValue)):
-                return lhsValue == rhsValue
-            case (.downloaded(let lhsValue), .downloaded(let rhsValue)):
-                return lhsValue == rhsValue
-            case (.failed(let lhsValue), .failed(let rhsValue)):
-                return lhsValue._code == rhsValue._code && lhsValue._domain == rhsValue._domain
-            default:
-                return false
-            }
-        }
-        
         case downloading(Progress)
         case downloaded(Foundation.URL)
-        case failed(Error)
-        
-        public func hash(into hasher: inout Hasher) {
-            switch self {
-            case .downloading(let progress):
-                hasher.combine(1 << 0)
-                hasher.combine(progress)
-            case .downloaded(let url):
-                hasher.combine(1 << 1)
-                hasher.combine(url)
-            case .failed(let error):
-                hasher.combine(1 << 2)
-                hasher.combine(error._code)
-                hasher.combine(error._domain)
+    }
+    
+    @objc public let name: String
+    
+    public let createdDate: FoundationEssentials.Date
+    
+    @objc(createdDate) public var createdNSDate: NSDate {
+        .init(timeIntervalSinceReferenceDate: createdDate.timeIntervalSinceReferenceDate)
+    }
+    
+    public internal(set) var state: State {
+        willSet {
+            if state != newValue {
+                willChangeValue(for: \.isDownloading)
+                willChangeValue(for: \.downloadingProgress)
+                willChangeValue(for: \.downloadedURL)
+            }
+        }
+        didSet {
+            if oldValue != state {
+                didChangeValue(for: \.isDownloading)
+                didChangeValue(for: \.downloadingProgress)
+                didChangeValue(for: \.downloadedURL)
             }
         }
     }
     
-    public let name: String
-    public let createdDate: FoundationEssentials.Date
-    public let state: State
+    @objc public var isDownloading: Bool {
+        switch state {
+        case .downloading:
+            true
+        default:
+            false
+        }
+    }
+    
+    @objc public var downloadingProgress: Progress? {
+        switch state {
+        case .downloading(let progress):
+            return progress
+        default:
+            return nil
+        }
+    }
+    
+    @objc public var downloadedURL: Foundation.URL? {
+        switch state {
+        case .downloaded(let url):
+            return url
+        default:
+            return nil
+        }
+    }
+    
+    public override var hash: Int {
+        name.hash
+    }
+    
+    init(name: String, createdDate: FoundationEssentials.Date, state: State) {
+        self.name = name
+        self.createdDate = createdDate
+        self.state = state
+        super.init()
+    }
 }

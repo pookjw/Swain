@@ -13,6 +13,16 @@ import NIOCore
 import RegexBuilder
 import Darwin
 
+extension ProgressUserInfoKey {
+    public static var toolchainNameKey: ProgressUserInfoKey {
+        .init("toolchainName")
+    }
+    
+    public static var cancelReasonErrorKey: ProgressUserInfoKey {
+        .init("cancelReasonError")
+    }
+}
+
 @globalActor
 public actor ToolchainPackageManager {
     public enum Error: Swift.Error {
@@ -28,6 +38,14 @@ public actor ToolchainPackageManager {
     
     public static nonisolated func getDidChangeToolchainPackagesNotificationName() -> String {
         "ToolchainPackageManagerDidChangeToolchainPackagesNotificationName"
+    }
+    
+    public static nonisolated var toolchainNameProgressUserInfoKey: String {
+        ProgressUserInfoKey.toolchainNameKey.rawValue
+    }
+    
+    public static nonisolated var cancelReasonErrorProgressUserInfoKey: String {
+        ProgressUserInfoKey.cancelReasonErrorKey.rawValue
     }
     
     public static nonisolated var deletedNamesKey: String {
@@ -261,6 +279,7 @@ extension ToolchainPackageManager {
             }
             
             let progress: Progress = .init(totalUnitCount: contentLength)
+            progress.setUserInfoObject(name, forKey: .toolchainNameKey)
             
             progress.cancellationHandler = {
                 client.shutdown { _ in
@@ -311,6 +330,7 @@ extension ToolchainPackageManager {
             return destinationURL
         } catch {
             if let _progress: Progress {
+                _progress.setUserInfoObject(error, forKey: .cancelReasonErrorKey)
                 _progress.cancel()
             } else {
                 let progress: Progress = .init(totalUnitCount: 1)
