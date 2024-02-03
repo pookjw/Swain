@@ -8,7 +8,6 @@
 import Foundation
 @_exported import SwiftData
 @_exported import CoreData
-import HandyMacros
 
 @globalActor
 public actor ToolchainDataManager {

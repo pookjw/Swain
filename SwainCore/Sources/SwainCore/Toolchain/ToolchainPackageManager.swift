@@ -28,7 +28,7 @@ extension ProgressUserInfoKey {
 }
 
 extension UTType {
-    fileprivate static var installerPackage: UTType {
+    static var installerPackage: UTType {
         .init("com.apple.installer-package-archive")!
     }
 }
@@ -76,7 +76,8 @@ public actor ToolchainPackageManager {
         }
     }
     
-    private let downloadsURL: Foundation.URL = .applicationSupportDirectory
+    @_spi(SwainCoreTests)
+    public nonisolated let downloadsURL: Foundation.URL = .applicationSupportDirectory
         .appending(path: "SwainCore", directoryHint: .isDirectory)
         .appending(path: "ToolchainPackages", directoryHint: .isDirectory)
     
@@ -154,7 +155,7 @@ public actor ToolchainPackageManager {
         }
     }
     
-    private var mdQueryInitlaizer: Void {
+    private nonisolated var mdQueryInitlaizer: Void {
         @storageRestrictions(initializes: mdQuery, accesses: downloadsURL, mdQueryWeakPtrContext, notificationCallback)
         init(__) {
             let queryString: CFString = withVaList(
@@ -271,12 +272,14 @@ public actor ToolchainPackageManager {
 }
 
 extension ToolchainPackageManager {
-    private nonisolated func destinationURL(name: String) -> Foundation.URL {
+    @_spi(SwainCoreTests)
+    public nonisolated func destinationURL(name: String) -> Foundation.URL {
         downloadsURL
             .appending(component: "\(name)-osx.pkg", directoryHint: .notDirectory)
     }
     
-    private nonisolated func packageURLString(name: String, categoryType: Toolchain.Category) -> String? {
+    @_spi(SwainCoreTests)
+    public nonisolated func packageURLString(name: String, categoryType: Toolchain.Category) -> String? {
         switch categoryType {
         case .stable:
             let regex: Regex = .init {
@@ -550,7 +553,7 @@ extension ToolchainPackageManager {
                     CFStringBuiltInEncodings.UTF8.rawValue
                 )
             ),
-            Unmanaged<ToolchainPackageManager>.passUnretained(self).toOpaque(),
+            Unmanaged.passUnretained(self).toOpaque(),
             userInfo,
             .init(true)
         )

@@ -7,6 +7,7 @@
 
 import XCTest
 import Testing
+import Darwin
 @testable @_spi(SwainCoreTests) import SwainCore
 
 final class SwainCoreTests: XCTestCase {
@@ -16,6 +17,13 @@ final class SwainCoreTests: XCTestCase {
     
     override func tearDown() async throws {
         try await ToolchainDataManager.shared.destory()
+        
+        let downloadsURL: Foundation.URL = ToolchainPackageManager.shared.downloadsURL
+        print(downloadsURL)
+        
+        if access(downloadsURL.path(percentEncoded: false), F_OK) != .zero {
+            XCTAssertEqual(remove(downloadsURL.path), .zero)
+        }
     }
     
     func testAll() async {

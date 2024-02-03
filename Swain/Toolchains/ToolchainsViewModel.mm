@@ -87,11 +87,13 @@ __attribute__((objc_direct_members))
                     auto fetchedResultsController = [self makeFetchedResultsControllerWithManagedObjectContext:childManagedObjectContext toolchainCategory:toolchainCategory searchText:searchText];
                     self.fetchedResultsController = fetchedResultsController;
                     
-                    NSError * _Nullable error = nil;
-                    [fetchedResultsController performFetch:&error];
-                    completionHandler(error);
-                    
-                    self.isLoading = NO;
+                    [childManagedObjectContext performBlock:^{
+                        NSError * _Nullable error = nil;
+                        [fetchedResultsController performFetch:&error];
+                        completionHandler(error);
+                        
+                        self.isLoading = NO;
+                    }];
                 });
             });
         }

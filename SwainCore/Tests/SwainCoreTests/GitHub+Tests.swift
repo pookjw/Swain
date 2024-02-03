@@ -12,12 +12,12 @@ import UniformTypeIdentifiers
 
 extension GitHub {
     struct Tests {
-        @Test(.tags(["test_swiftRefs"])) func test_swiftRefs() async throws {
+        @Test(.tags("test_swiftRefs")) func test_swiftRefs() async throws {
             let result: [GitHub.Ref] = try await GitHub.swiftRefs()
             #expect(!result.isEmpty)
         }
         
-        @Test(.tags(["test_decodeTag"])) func test_decodeTag() throws {
+        @Test(.tags("test_decodeTag")) func test_decodeTag() throws {
             let url: Foundation.URL = try #require(Bundle.module.url(forResource: "ref_tag", withExtension: UTType.json.preferredFilenameExtension))
             let nsData: Foundation.NSData = try .init(contentsOf: url)
             

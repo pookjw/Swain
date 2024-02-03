@@ -10,11 +10,11 @@ import Testing
 
 extension ToolchainDataManager {
     struct Tests {
-        @Test(.tags(["test_configure"])) func test_modelContext() async throws {
+        @Test(.tags("test_configure")) func test_modelContext() async throws {
             _ = try await ToolchainDataManager.shared.modelContext
         }
         
-        @Test(.tags(["test_reloadToolchains"])) func test_reloadToolchains() async throws {
+        @Test(.tags("test_reloadToolchains")) func test_reloadToolchains() async throws {
             try await ToolchainDataManager.shared.reloadToolchains()
             
             let modelContext: ModelContext! = try await ToolchainDataManager.shared.modelContext
@@ -25,7 +25,7 @@ extension ToolchainDataManager {
             #expect(!toolchains.isEmpty)
         }
         
-        @Test(.tags(["test_managedObjectContext"])) func test_managedObjectContext() async throws {
+        @Test(.tags("test_managedObjectContext")) func test_managedObjectContext() async throws {
             let managedObjectContext: NSManagedObjectContext? = try await ToolchainDataManager.shared.managedObjectContext()
             #expect(managedObjectContext != nil)
         }

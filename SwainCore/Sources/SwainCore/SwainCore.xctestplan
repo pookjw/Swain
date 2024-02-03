@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "B93B21C7-EC22-411B-A94B-FB9D5A0D2B1E",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "environmentVariableEntries" : [
+      {
+        "enabled" : false,
+        "key" : "SWT_SELECTED_TAGS",
+        "value" : "test_mdQuery"
+      }
+    ]
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SwainCoreTests",
+        "name" : "SwainCoreTests"
+      }
+    }
+  ],
+  "version" : 1
+}
