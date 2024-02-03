@@ -8,10 +8,12 @@
 import Foundation
 import CoreFoundation
 import CoreData
+import CoreServices
 import AsyncHTTPClient
 import NIOCore
 import RegexBuilder
 import Darwin
+import UniformTypeIdentifiers
 
 extension ProgressUserInfoKey {
     public static var toolchainNameKey: ProgressUserInfoKey {
@@ -71,6 +73,10 @@ public actor ToolchainPackageManager {
     
     private init() {
         toolchainPackages = []
+        
+        Task {
+            await updateToolchainPackages()
+        }
     }
     
     public func downloadedURL(for toolchain: Toolchain) async -> URL? {
@@ -457,5 +463,50 @@ extension ToolchainPackageManager {
             userInfo,
             .init(true)
         )
+    }
+    
+    private func updateToolchainPackages() {
+        let downloadsURL: URL = downloadsURL
+        let downloadsURLString: [CChar]! = downloadsURL.path(percentEncoded: false).cString(using: .utf8)
+    
+        if access(downloadsURLString, F_OK) != .zero {
+            let result: Int32 = mkdir(downloadsURLString, S_IRWXU | S_IRWXG | S_IRWXO)
+            assert(result == .zero)
+        }
+        
+        let dir: UnsafeMutablePointer<DIR>! = opendir(downloadsURLString)
+        
+        var toolchainPackages: [ToolchainPackage] = .init()
+        
+        while let dirent: UnsafeMutablePointer<dirent> = readdir(dir) {
+            guard dirent.pointee.d_type == DT_REG else { continue }
+            
+            withUnsafePointer(to: dirent.pointee.d_name) { basePtr in
+                basePtr.withMemoryRebound(to: CChar.self, capacity: Int(dirent.pointee.d_namlen)) { buffer in
+                    let name: String = .init(cString: buffer)
+                    let downloadedURL: URL = downloadsURL
+                        .appending(path: name)
+                    
+                    guard downloadedURL.pathExtension == UTType("com.apple.installer-package-archive")?.preferredFilenameExtension else {
+                        return
+                    }
+                    
+                    
+                    
+//                    let result: Int32 = stat(downloadedURL.path(percentEncoded: false), <#T##UnsafeMutablePointer<stat>!#>)
+                    
+                    let toolchainPackage: ToolchainPackage = .init(
+                        name: name,
+                        createdDate: .now,
+                        state: .downloaded(downloadedURL)
+                    )
+                    
+                    toolchainPackages.append(toolchainPackage)
+                }
+            }
+        }
+        
+        assert(closedir(dir) == .zero)
+        self.toolchainPackages = toolchainPackages
     }
 }
