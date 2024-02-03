@@ -14,6 +14,8 @@ import NIOCore
 import RegexBuilder
 import Darwin
 import UniformTypeIdentifiers
+import ObjectiveC
+import FoundationEssentials
 
 extension ProgressUserInfoKey {
     public static var toolchainNameKey: ProgressUserInfoKey {
@@ -25,9 +27,16 @@ extension ProgressUserInfoKey {
     }
 }
 
+extension UTType {
+    fileprivate static var installerPackage: UTType {
+        .init("com.apple.installer-package-archive")!
+    }
+}
+
 @globalActor
 public actor ToolchainPackageManager {
     public enum Error: Swift.Error {
+        case downloading
         case noManagedObjectContext
         case corrupted
     }
@@ -67,50 +76,34 @@ public actor ToolchainPackageManager {
         }
     }
     
-    private let downloadsURL: URL = .applicationSupportDirectory
+    private let downloadsURL: Foundation.URL = .applicationSupportDirectory
         .appending(path: "SwainCore", directoryHint: .isDirectory)
         .appending(path: "ToolchainPackages", directoryHint: .isDirectory)
     
+    private let mdQuery: MDQuery
+    private let mdQueryWeakPtrContext: UnsafeMutablePointer<AnyObject?> = .allocate(capacity: 1)
+
+    private let notificationCallback: CFNotificationCallback = { notificationCenter, observer, notificationName, object, userInfo in
+        guard
+            let object: UnsafeRawPointer,
+            let manager: ToolchainPackageManager = objc_loadWeak(unsafeBitCast(observer, to: AutoreleasingUnsafeMutablePointer<AnyObject?>.self)) as? ToolchainPackageManager
+        else {
+            return
+        }
+        
+        let query: MDQuery = unsafeBitCast(object, to: MDQuery.self)
+        manager.mdQueryDidUpdate(query)
+    }
+    
     private init() {
         toolchainPackages = []
-        
-        Task {
-            await updateToolchainPackages()
-        }
+        mdQueryInitlaizer = ()
+        objc_storeWeak(.init(mdQueryWeakPtrContext), self)
+        assert(MDQueryExecute(mdQuery, .init(kMDQueryWantsUpdates.rawValue)))
     }
     
-    public func initialize() {
-        // TODO: NSMetadataQuery
-        
-//        dirent().
-    }
-    
-    public func downloadedURL(for toolchain: Toolchain) async -> URL? {
-        let name: String = toolchain.name
-        return downloadedURL(name: name)
-    }
-    
-    public func download(for toolchain: Toolchain, progressHandler: @escaping (@Sendable (_ progress: Progress) -> Void)) async throws -> URL {
-        let (name, categoryType): (String, Toolchain.Category) = await MainActor.run {
-            (toolchain.name, toolchain.categoryType)
-        }
-        
-        return try await download(name: name, categoryType: categoryType, progressHandler: progressHandler)
-    }
-    
-    public func packageURL(for name: String, category: String) async throws -> URL? {
-        guard let categoryType: Toolchain.Category = .init(rawValue: category) else {
-            return nil
-        }
-        
-        guard
-            let urlString: String = packageURLString(name: name, categoryType: categoryType),
-            let url: URL = .init(string: urlString)
-        else {
-            return nil
-        }
-        
-        return url
+    deinit {
+        mdQueryWeakPtrContext.deallocate()
     }
     
     public nonisolated func getToolchainPackages(completionHandler: UnsafeRawPointer) {
@@ -126,69 +119,161 @@ public actor ToolchainPackageManager {
         }
     }
     
-    public nonisolated func getDownloadedURL(for name: String, completionHandler: UnsafeRawPointer) {
-        typealias BlockType = @convention(block) @Sendable (URL?) -> Void
-        
-        let copiedBlock: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as AnyObject
-        
-        Task {
-            let castedBlock: BlockType = unsafeBitCast(copiedBlock, to: BlockType.self)
-            
-            let result: URL? = await downloadedURL(name: name)
-            castedBlock(result)
-        }
-    }
-    
     public nonisolated func download(
         for name: String,
         category: String,
-        progressHandler: UnsafeRawPointer,
+        toolchainPackageHandler: UnsafeRawPointer,
         completionHandler: UnsafeRawPointer
     ) {
-        typealias ProgressHandlerType = @convention(block) @Sendable (Progress) -> Void
-        typealias CompletionHandlerType = @convention(block) @Sendable (URL?, Swift.Error?) -> Void
+        typealias ToolchainPackagrHandlerType = @convention(block) @Sendable (ToolchainPackage) -> Void
+        typealias CompletionHandlerType = @convention(block) @Sendable (Foundation.URL?, Swift.Error?) -> Void
         
         guard let categoryType: Toolchain.Category = .init(rawValue: category) else {
-            let progress: Progress = .init(totalUnitCount: 1)
-            progress.cancel()
-            
-            unsafeBitCast(progressHandler, to: ProgressHandlerType.self)(progress)
             unsafeBitCast(completionHandler, to: CompletionHandlerType.self)(nil, Error.corrupted)
-            
             return
         }
         
-        let copiedProgressHandler: AnyObject = unsafeBitCast(progressHandler, to: AnyObject.self).copy() as AnyObject
+        let copiedToolchainPackageHandler: AnyObject = unsafeBitCast(toolchainPackageHandler, to: AnyObject.self).copy() as AnyObject
         let copiedCompletionHandler: AnyObject = unsafeBitCast(completionHandler, to: AnyObject.self).copy() as AnyObject
         
         Task {
-            let castedProgressHandler: ProgressHandlerType = unsafeBitCast(copiedProgressHandler, to: ProgressHandlerType.self)
+            let castedToolchainPackageHandler: ToolchainPackagrHandlerType = unsafeBitCast(copiedToolchainPackageHandler, to: ToolchainPackagrHandlerType.self)
             let castedCompletionHandler: CompletionHandlerType = unsafeBitCast(copiedCompletionHandler, to: CompletionHandlerType.self)
             
             do {
-                let result: URL = try await download(name: name, categoryType: categoryType, progressHandler: castedProgressHandler)
+                let result: Foundation.URL = try await download(
+                    name: name,
+                    categoryType: categoryType,
+                    toolchainPackageHandler: castedToolchainPackageHandler
+                )
+                
                 castedCompletionHandler(result, nil)
             } catch {
                 castedCompletionHandler(nil, error)
             }
         }
     }
+    
+    private var mdQueryInitlaizer: Void {
+        @storageRestrictions(initializes: mdQuery, accesses: downloadsURL, mdQueryWeakPtrContext, notificationCallback)
+        init(__) {
+            let queryString: CFString = withVaList(
+                [
+                    CFStringGetCStringPtr(kMDItemContentType, CFStringBuiltInEncodings.UTF8.rawValue),
+                    UTType.installerPackage.identifier
+                ]
+            ) { ptr in
+                let format: CFString = CFStringCreateWithCString(
+                    kCFAllocatorDefault, 
+                    "%s == '%@'",
+                    CFStringBuiltInEncodings.UTF8.rawValue
+                )
+                
+                let result: CFString = CFStringCreateWithFormatAndArguments(
+                    kCFAllocatorDefault,
+                    nil,
+                    format,
+                    ptr
+                )
+                
+                return result
+            }
+            
+            let queryValues: UnsafeMutableBufferPointer<UnsafeRawPointer?> = .allocate(capacity: 2)
+            
+            queryValues[.zero] = unsafeBitCast(kMDItemFSName, to: UnsafeRawPointer.self)
+            queryValues[1] = unsafeBitCast(kMDItemFSCreationDate, to: UnsafeRawPointer.self)
+            
+            let valueListAttrs: CFArray = withUnsafePointer(to: kCFTypeArrayCallBacks) { ptr in
+                CFArrayCreate(
+                    kCFAllocatorDefault,
+                    queryValues.baseAddress,
+                    queryValues.count,
+                    ptr
+                )
+            }
+            
+            queryValues.deallocate()
+            
+            let mdQuery: MDQuery = withUnsafePointer(to: kCFTypeArrayCallBacks) { ptr_3 in
+                MDQueryCreate(
+                    kCFAllocatorDefault,
+                    queryString,
+                    valueListAttrs,
+                    nil
+                )  
+            }
+            
+            let downloadsCFString: CFString = CFStringCreateWithCString(
+                kCFAllocatorDefault,
+                downloadsURL.path(),
+                CFStringBuiltInEncodings.UTF8.rawValue
+            )
+            
+            let downloadsCFURL: CFURL = CFURLCreateWithString(
+                kCFAllocatorDefault,
+                downloadsCFString,
+                nil
+            )
+            
+            withUnsafePointer(to: downloadsCFURL) { ptr_1 in
+                ptr_1.withMemoryRebound(to: UnsafeRawPointer?.self, capacity: 1) { ptr_2 in
+                    withUnsafePointer(to: kCFTypeArrayCallBacks) { ptr_3 in
+                        MDQuerySetSearchScope(
+                            mdQuery,
+                            CFArrayCreate(
+                                kCFAllocatorDefault,
+                                .init(mutating: ptr_2),
+                                1,
+                                ptr_3
+                            ),
+                            .zero
+                        )
+                    }
+                }
+            }
+            
+            MDQuerySetDispatchQueue(mdQuery, .global())
+            
+            withUnsafePointer(to: kCFTypeArrayCallBacks) { [mdQueryWeakPtrContext] ptr in
+                MDQuerySetCreateResultFunction(
+                    mdQuery,
+                    nil,
+                    mdQueryWeakPtrContext,
+                    ptr
+                )
+            }
+            
+            CFNotificationCenterAddObserver(
+                CFNotificationCenterGetLocalCenter(),
+                mdQueryWeakPtrContext,
+                notificationCallback,
+                kMDQueryDidFinishNotification,
+                unsafeBitCast(mdQuery, to: UnsafeRawPointer.self),
+                .deliverImmediately
+            )
+            
+            CFNotificationCenterAddObserver(
+                CFNotificationCenterGetLocalCenter(),
+                mdQueryWeakPtrContext,
+                notificationCallback,
+                kMDQueryDidUpdateNotification,
+                unsafeBitCast(mdQuery, to: UnsafeRawPointer.self),
+                .deliverImmediately
+            )
+            
+            self.mdQuery = mdQuery
+        }
+        get {
+            
+        }
+    }
 }
 
 extension ToolchainPackageManager {
-    private nonisolated func destinationURL(name: String) -> URL {
+    private nonisolated func destinationURL(name: String) -> Foundation.URL {
         downloadsURL
             .appending(component: "\(name)-osx.pkg", directoryHint: .notDirectory)
-    }
-    
-    private func downloadedURL(name: String) -> URL? {
-        let url: URL = destinationURL(name: name)
-        
-        guard access(url.path(percentEncoded: false).cString(using: .utf8), F_OK) == .zero else {
-            return nil
-        }
-        
-        return url
     }
     
     private nonisolated func packageURLString(name: String, categoryType: Toolchain.Category) -> String? {
@@ -242,14 +327,14 @@ extension ToolchainPackageManager {
         }
     }
     
-    private func download(name: String, categoryType: Toolchain.Category, progressHandler: @escaping (@Sendable (Progress) -> Void)) async throws -> URL {
-        if let downloadedURL: URL = downloadedURL(name: name) {
-            let progress: Progress = .init(totalUnitCount: 1)
-            progress.completedUnitCount = 1
-            
-            toolchainPackages.append(.init(name: name, createdDate: .now, state: .downloaded(downloadedURL)))
-            progressHandler(progress)
-            return downloadedURL
+    private func download(
+        name: String,
+        categoryType: Toolchain.Category,
+        toolchainPackageHandler: @escaping (@Sendable (ToolchainPackage) -> Void)
+    ) async throws -> Foundation.URL {
+        if let toolchainPackage: ToolchainPackage = toolchainPackages.first(where: { $0.name == name }) {
+            toolchainPackageHandler(toolchainPackage)
+            throw Error.downloading
         }
         
         var _progress: Progress?
@@ -281,8 +366,8 @@ extension ToolchainPackageManager {
                 assert(result == .zero)
             }
             
-            let destinationURL: URL = destinationURL(name: name)
-            let destinationTmpURL: URL = destinationURL
+            let destinationURL: Foundation.URL = destinationURL(name: name)
+            let destinationTmpURL: Foundation.URL = destinationURL
                 .appendingPathExtension("tmp")
             
             // TODO: resume
@@ -303,12 +388,16 @@ extension ToolchainPackageManager {
             
             let toolchainPackage: ToolchainPackage = .init(
                 name: name,
-                createdDate: .now,
+                creationDate: .now,
                 state: .downloading(progress)
             )
             
+            var toolchainPackages: [ToolchainPackage] = self.toolchainPackages
             toolchainPackages.append(toolchainPackage)
-            progressHandler(progress)
+            toolchainPackages.sort { $0.creationDate > $1.creationDate }
+            self.toolchainPackages = toolchainPackages
+            
+            toolchainPackageHandler(toolchainPackage)
             
             let file: UnsafeMutablePointer<FILE> = fopen(destinationTmpURL.path(percentEncoded: false).cString(using: .utf8), "a+")
             _file = file
@@ -344,10 +433,6 @@ extension ToolchainPackageManager {
             if let _progress: Progress {
                 _progress.setUserInfoObject(error, forKey: .cancelReasonErrorKey)
                 _progress.cancel()
-            } else {
-                let progress: Progress = .init(totalUnitCount: 1)
-                progress.cancel()
-                progressHandler(progress)
             }
             
             if let _client: AsyncHTTPClient.HTTPClient {
@@ -471,48 +556,91 @@ extension ToolchainPackageManager {
         )
     }
     
-    private func updateToolchainPackages() {
-        let downloadsURL: URL = downloadsURL
-        let downloadsURLString: [CChar]! = downloadsURL.path(percentEncoded: false).cString(using: .utf8)
-    
-        if access(downloadsURLString, F_OK) != .zero {
-            let result: Int32 = mkdir(downloadsURLString, S_IRWXU | S_IRWXG | S_IRWXO)
-            assert(result == .zero)
-        }
+    private nonisolated func mdQueryDidUpdate(_ query: MDQuery) {
+        let count: CFIndex = MDQueryGetResultCount(query)
         
-        let dir: UnsafeMutablePointer<DIR>! = opendir(downloadsURLString)
-        
-        var toolchainPackages: [ToolchainPackage] = .init()
-        
-        while let dirent: UnsafeMutablePointer<dirent> = readdir(dir) {
-            guard dirent.pointee.d_type == DT_REG else { continue }
-            
-            withUnsafePointer(to: dirent.pointee.d_name) { basePtr in
-                basePtr.withMemoryRebound(to: CChar.self, capacity: Int(dirent.pointee.d_namlen)) { buffer in
-                    let name: String = .init(cString: buffer)
-                    let downloadedURL: URL = downloadsURL
-                        .appending(path: name)
-                    
-                    guard downloadedURL.pathExtension == UTType("com.apple.installer-package-archive")?.preferredFilenameExtension else {
-                        return
-                    }
-                    
-                    
-                    
-//                    let result: Int32 = stat(downloadedURL.path(percentEncoded: false), <#T##UnsafeMutablePointer<stat>!#>)
-                    
-                    let toolchainPackage: ToolchainPackage = .init(
-                        name: name,
-                        createdDate: .now,
-                        state: .downloaded(downloadedURL)
-                    )
-                    
-                    toolchainPackages.append(toolchainPackage)
-                }
+        guard count > .zero else {
+            Task {
+                await setToolchainPackages(.init())
             }
+            return
         }
         
-        assert(closedir(dir) == .zero)
+        var metadata: [(String, FoundationEssentials.Date)] = .init()
+        
+        for i in 0..<count {
+            guard let nameRef: UnsafeMutableRawPointer = MDQueryGetAttributeValueOfResultAtIndex(query, kMDItemFSName, i) else {
+                continue
+            }
+            
+            guard let dateRef: UnsafeMutableRawPointer = MDQueryGetAttributeValueOfResultAtIndex(query, kMDItemFSCreationDate, i) else {
+                continue
+            }
+            
+            let name: String = .init(
+                cString: CFStringGetCStringPtr(
+                    unsafeBitCast(nameRef, to: CFString.self),
+                    CFStringBuiltInEncodings.UTF8.rawValue
+                )
+            )
+            
+            let date: FoundationEssentials.Date = .init(
+                timeIntervalSinceReferenceDate: CFDateGetAbsoluteTime(
+                    unsafeBitCast(dateRef, to: CFDate.self)
+                )
+            )
+            
+            metadata.append((name, date))
+        }
+        
+        Task { [metadata] in
+            await updateToolchainPackages(metadata: metadata)
+        }
+    }
+    
+    private func updateToolchainPackages(metadata: [(String, FoundationEssentials.Date)]) {
+        guard !metadata.isEmpty else {
+            return
+        }
+        
+        var toolchainPackages: [ToolchainPackage] = toolchainPackages
+        
+        for datum in metadata {
+            guard !toolchainPackages.contains(where: { $0.name == datum.0 }) else {
+                continue
+            }
+            
+            let url: Foundation.URL = downloadsURL
+                .appending(component: datum.0, directoryHint: .notDirectory)
+            
+            let toolchainPackage: ToolchainPackage = .init(
+                name: datum.0,
+                creationDate: datum.1,
+                state: .downloaded(url)
+            )
+            
+            toolchainPackages.append(toolchainPackage)
+        }
+        
+        var removedIndexes: Set<Int> = .init()
+        for (index, toolchainPackage) in toolchainPackages.enumerated() {
+            guard !metadata.contains(where: { $0.0 == toolchainPackage.name }) else {
+                continue
+            }
+            
+            removedIndexes.insert(index)
+        }
+        
+        for index in removedIndexes {
+            toolchainPackages.remove(at: index)
+        }
+        
+        toolchainPackages.sort(by: { $0.creationDate > $1.creationDate })
+        
+        self.toolchainPackages = toolchainPackages
+    }
+    
+    private func setToolchainPackages(_ toolchainPackages: [ToolchainPackage]) {
         self.toolchainPackages = toolchainPackages
     }
 }

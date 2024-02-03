@@ -135,7 +135,7 @@ __attribute__((objc_direct_members))
     self.textField = nameTextField;
     _nameTextField = [nameTextField retain];
     
-    return [nameTextField autorelease];
+    return nameTextField;
 }
 
 - (NSProgressIndicator *)progressIndicator {
@@ -186,7 +186,8 @@ __attribute__((objc_direct_members))
 
 - (void)openButtonDidTrigger:(NSButton *)sender {
     if (NSURL *downloadedURL = self.itemModel.toolchainPackage.stateInfo[SWCToolchainPackage.downloadedURLKey]) {
-        [NSWorkspace.sharedWorkspace openURL:downloadedURL];
+//        [NSWorkspace.sharedWorkspace openURL:downloadedURL];
+        [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[downloadedURL]];
     }
 }
 

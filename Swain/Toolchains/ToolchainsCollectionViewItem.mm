@@ -156,8 +156,8 @@ __attribute__((objc_direct_members))
             
             ToolchainPackageManager::getSharedInstance().download([name cStringUsingEncoding:NSUTF8StringEncoding],
                                                                   [category cStringUsingEncoding:NSUTF8StringEncoding],
-                                                                  ^(NSProgress *progress) {
-                NSLog(@"%@", progress);
+                                                                  ^(SWCToolchainPackage *toolchainPackage) {
+                NSLog(@"%@", toolchainPackage);
             },
                                                                   ^(NSURL * _Nullable url, NSError * _Nullable error) {
                 assert(!error);

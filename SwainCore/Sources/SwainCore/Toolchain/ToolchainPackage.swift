@@ -24,10 +24,10 @@ public final class ToolchainPackage: NSObject, @unchecked Sendable {
     
     @objc public let name: String
     
-    public let createdDate: FoundationEssentials.Date
+    public let creationDate: FoundationEssentials.Date
     
-    @objc(createdDate) public var createdNSDate: NSDate {
-        .init(timeIntervalSinceReferenceDate: createdDate.timeIntervalSinceReferenceDate)
+    @objc(creationDate) public var creationNSDate: NSDate {
+        .init(timeIntervalSinceReferenceDate: creationDate.timeIntervalSinceReferenceDate)
     }
     
     public internal(set) var state: State {
@@ -77,9 +77,9 @@ public final class ToolchainPackage: NSObject, @unchecked Sendable {
         }
     }
     
-    init(name: String, createdDate: FoundationEssentials.Date, state: State) {
+    init(name: String, creationDate: FoundationEssentials.Date, state: State) {
         self.name = name
-        self.createdDate = createdDate
+        self.creationDate = creationDate
         self.state = state
         super.init()
     }
