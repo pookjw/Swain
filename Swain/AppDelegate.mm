@@ -7,10 +7,10 @@
 
 #import "AppDelegate.hpp"
 #import "MainWindow.hpp"
+#import "HelperManager.hpp"
 
+__attribute__((objc_direct_members))
 @interface AppDelegate ()
-
-
 @end
 
 @implementation AppDelegate
@@ -20,6 +20,15 @@
     window.releasedWhenClosed = NO;
     [window makeKeyAndOrderFront:self];
     [window release];
+    
+#if !SANDBOXED
+    [HelperManager.sharedInstance uninstallHelperWithCompletionHandler:^(NSError * _Nullable error) {
+        NSLog(@"%@", error);
+        [HelperManager.sharedInstance installHelperWithCompletionHandler:^(NSError * _Nullable error) {
+            NSLog(@"%@", error);
+        }];
+    }];
+#endif
 }
 
 

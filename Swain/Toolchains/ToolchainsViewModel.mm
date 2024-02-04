@@ -155,9 +155,11 @@ __attribute__((objc_direct_members))
     }
     
     dispatch_async(_queue, ^{
-        NSError * _Nullable error = nil;
-        [self.fetchedResultsController performFetch:&error];
-        assert(!error);
+        [self.childManagedObjectContext performBlock:^{
+            NSError * _Nullable error = nil;
+            [self.fetchedResultsController performFetch:&error];
+            assert(!error);
+        }];
     });
 }
 

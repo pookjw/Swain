@@ -361,7 +361,7 @@ namespace ns_MainWindow {
     popover.contentViewController = contentViewController;
     [contentViewController release];
     
-    popover.behavior = NSPopoverBehaviorApplicationDefined;
+    popover.behavior = NSPopoverBehaviorTransient;
     popover.contentSize = NSMakeSize(600.f, 400.f);
     
     [popover showRelativeToToolbarItem:sender];

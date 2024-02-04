@@ -8,6 +8,7 @@
 #import "DownloadingToolchainsViewItem.hpp"
 #import "NSView+Private.h"
 #import "NSTextField+ApplyLabelStyle.hpp"
+#import "HelperManager.hpp"
 
 namespace ns_DownloadingToolchainsViewItem {
     NSUserInterfaceItemIdentifier const identifier = NSStringFromClass(DownloadingToolchainsViewItem.class);
@@ -187,7 +188,14 @@ __attribute__((objc_direct_members))
 - (void)openButtonDidTrigger:(NSButton *)sender {
     if (NSURL *downloadedURL = self.itemModel.toolchainPackage.stateInfo[SWCToolchainPackage.downloadedURLKey]) {
 //        [NSWorkspace.sharedWorkspace openURL:downloadedURL];
+        
+#if SANDBOXED
         [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[downloadedURL]];
+#else
+        [HelperManager.sharedInstance installPackageWithURL:downloadedURL completionHandler:^(NSError * _Nullable error) {
+            assert(!error);
+        }];
+#endif
     }
 }
 
