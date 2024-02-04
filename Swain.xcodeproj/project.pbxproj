@@ -12,6 +12,28 @@
 		4F16FDBF2B65036500C5BA50 /* DownloadingToolchainsViewItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F16FDBE2B65036500C5BA50 /* DownloadingToolchainsViewItem.mm */; };
 		4F16FDD52B65099B00C5BA50 /* NSTextField+ApplyLabelStyle.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F16FDD32B65099B00C5BA50 /* NSTextField+ApplyLabelStyle.mm */; };
 		4F16FDD82B650B9E00C5BA50 /* DownloadingToolchainsViewItemModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F16FDD72B650B9E00C5BA50 /* DownloadingToolchainsViewItemModel.mm */; };
+		4F41E6392B6FD8D300FB56B9 /* ToolchainsViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D392B54FE80003D9FE2 /* ToolchainsViewController.mm */; };
+		4F41E63A2B6FD8D300FB56B9 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */; };
+		4F41E63B2B6FD8D300FB56B9 /* MainWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D2F2B54F8AB003D9FE2 /* MainWindow.mm */; };
+		4F41E63C2B6FD8D300FB56B9 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D192B54EB1C003D9FE2 /* main.mm */; };
+		4F41E63D2B6FD8D300FB56B9 /* MainSidebarTableCellView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D432B5511B9003D9FE2 /* MainSidebarTableCellView.mm */; };
+		4F41E63E2B6FD8D300FB56B9 /* ToolchainsCollectionViewItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F6826652B5A16080063018F /* ToolchainsCollectionViewItem.mm */; };
+		4F41E63F2B6FD8D300FB56B9 /* DownloadingToolchainsViewItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F16FDBE2B65036500C5BA50 /* DownloadingToolchainsViewItem.mm */; };
+		4F41E6402B6FD8D300FB56B9 /* NSObject+Foundation_IvarDescription.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D352B54FB79003D9FE2 /* NSObject+Foundation_IvarDescription.mm */; };
+		4F41E6412B6FD8D300FB56B9 /* MainSidebarViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D322B54FB2E003D9FE2 /* MainSidebarViewController.mm */; };
+		4F41E6422B6FD8D300FB56B9 /* DownloadingToolchainsViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F16FDB82B64FEA100C5BA50 /* DownloadingToolchainsViewController.mm */; };
+		4F41E6432B6FD8D300FB56B9 /* MainSidebarTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F9162062B5BF4170068AE1F /* MainSidebarTableView.mm */; };
+		4F41E6442B6FD8D300FB56B9 /* MainSidebarItemModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE64ABC2B58203700558BCC /* MainSidebarItemModel.mm */; };
+		4F41E6452B6FD8D300FB56B9 /* ToolchainInspectorViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F9162302B5CC08F0068AE1F /* ToolchainInspectorViewController.mm */; };
+		4F41E6462B6FD8D300FB56B9 /* DownloadingToolchainsViewItemModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F16FDD72B650B9E00C5BA50 /* DownloadingToolchainsViewItemModel.mm */; };
+		4F41E6472B6FD8D300FB56B9 /* NSTextField+ApplyLabelStyle.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F16FDD32B65099B00C5BA50 /* NSTextField+ApplyLabelStyle.mm */; };
+		4F41E6482B6FD8D300FB56B9 /* ToolchainsViewModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */; };
+		4F41E6492B6FD8D300FB56B9 /* getStringFromSwiftString.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FF05FE92B62A0A4006EA354 /* getStringFromSwiftString.mm */; };
+		4F41E64A2B6FD8D300FB56B9 /* DownloadingToolchainsViewModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F16FDBB2B65023500C5BA50 /* DownloadingToolchainsViewModel.mm */; };
+		4F41E64B2B6FD8D300FB56B9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4FE08D142B54EB1C003D9FE2 /* Assets.xcassets */; };
+		4F41E64C2B6FD8D300FB56B9 /* MainSidebarTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4FE08D452B5511C3003D9FE2 /* MainSidebarTableCellView.xib */; };
+		4F41E64E2B6FD8FD00FB56B9 /* SwainCore in Frameworks */ = {isa = PBXBuildFile; productRef = 4F41E64D2B6FD8FD00FB56B9 /* SwainCore */; };
+		4F41E65D2B6FDA6500FB56B9 /* SwainXPCService.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 4F41E6532B6FDA6500FB56B9 /* SwainXPCService.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4F68265C2B59692B0063018F /* ToolchainsViewModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */; };
 		4F6826662B5A16080063018F /* ToolchainsCollectionViewItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F6826652B5A16080063018F /* ToolchainsCollectionViewItem.mm */; };
 		4F9162072B5BF4170068AE1F /* MainSidebarTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F9162062B5BF4170068AE1F /* MainSidebarTableView.mm */; };
@@ -34,6 +56,30 @@
 		4FF05FEB2B62A0A4006EA354 /* getStringFromSwiftString.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FF05FE92B62A0A4006EA354 /* getStringFromSwiftString.mm */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		4F41E65B2B6FDA6500FB56B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4FE08D032B54EB1B003D9FE2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4F41E6522B6FDA6500FB56B9;
+			remoteInfo = SwainXPCService;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4F41E6612B6FDA6500FB56B9 /* Embed XPC Services */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+				4F41E65D2B6FDA6500FB56B9 /* SwainXPCService.xpc in Embed XPC Services */,
+			);
+			name = "Embed XPC Services";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		4F16FDB72B64FEA100C5BA50 /* DownloadingToolchainsViewController.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DownloadingToolchainsViewController.hpp; sourceTree = "<group>"; };
 		4F16FDB82B64FEA100C5BA50 /* DownloadingToolchainsViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DownloadingToolchainsViewController.mm; sourceTree = "<group>"; };
@@ -45,6 +91,9 @@
 		4F16FDD42B65099B00C5BA50 /* NSTextField+ApplyLabelStyle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = "NSTextField+ApplyLabelStyle.hpp"; sourceTree = "<group>"; };
 		4F16FDD62B650B9E00C5BA50 /* DownloadingToolchainsViewItemModel.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = DownloadingToolchainsViewItemModel.hpp; sourceTree = "<group>"; };
 		4F16FDD72B650B9E00C5BA50 /* DownloadingToolchainsViewItemModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DownloadingToolchainsViewItemModel.mm; sourceTree = "<group>"; };
+		4F41E62A2B6FD8B400FB56B9 /* Swain_Sandboxed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Swain_Sandboxed.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4F41E6352B6FD8B500FB56B9 /* Swain_Sandboxed.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Swain_Sandboxed.entitlements; sourceTree = "<group>"; };
+		4F41E6532B6FDA6500FB56B9 /* SwainXPCService.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = SwainXPCService.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		4F68265A2B59692B0063018F /* ToolchainsViewModel.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsViewModel.hpp; sourceTree = "<group>"; };
 		4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsViewModel.mm; sourceTree = "<group>"; };
 		4F6826642B5A16080063018F /* ToolchainsCollectionViewItem.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsCollectionViewItem.hpp; sourceTree = "<group>"; };
@@ -82,6 +131,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4F41E6272B6FD8B400FB56B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F41E64E2B6FD8FD00FB56B9 /* SwainCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4F41E6502B6FDA6500FB56B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4FE08D082B54EB1B003D9FE2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -110,6 +174,14 @@
 				4F16FDD72B650B9E00C5BA50 /* DownloadingToolchainsViewItemModel.mm */,
 			);
 			path = DownloadingToolchains;
+			sourceTree = "<group>";
+		};
+		4F41E62B2B6FD8B400FB56B9 /* Swain_Sandboxed */ = {
+			isa = PBXGroup;
+			children = (
+				4F41E6352B6FD8B500FB56B9 /* Swain_Sandboxed.entitlements */,
+			);
+			path = Swain_Sandboxed;
 			sourceTree = "<group>";
 		};
 		4F9161B12B5BC0120068AE1F /* Category */ = {
@@ -153,6 +225,7 @@
 			isa = PBXGroup;
 			children = (
 				4FE08D0D2B54EB1B003D9FE2 /* Swain */,
+				4F41E62B2B6FD8B400FB56B9 /* Swain_Sandboxed */,
 				4FE08D0C2B54EB1B003D9FE2 /* Products */,
 				4FE08D242B54F7FF003D9FE2 /* Frameworks */,
 			);
@@ -162,6 +235,8 @@
 			isa = PBXGroup;
 			children = (
 				4FE08D0B2B54EB1B003D9FE2 /* Swain.app */,
+				4F41E62A2B6FD8B400FB56B9 /* Swain_Sandboxed.app */,
+				4F41E6532B6FDA6500FB56B9 /* SwainXPCService.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -222,6 +297,43 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		4F41E6292B6FD8B400FB56B9 /* Swain_Sandboxed */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4F41E6382B6FD8B500FB56B9 /* Build configuration list for PBXNativeTarget "Swain_Sandboxed" */;
+			buildPhases = (
+				4F41E6262B6FD8B400FB56B9 /* Sources */,
+				4F41E6272B6FD8B400FB56B9 /* Frameworks */,
+				4F41E6282B6FD8B400FB56B9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Swain_Sandboxed;
+			packageProductDependencies = (
+				4F41E64D2B6FD8FD00FB56B9 /* SwainCore */,
+			);
+			productName = Swain_Sandboxed;
+			productReference = 4F41E62A2B6FD8B400FB56B9 /* Swain_Sandboxed.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4F41E6522B6FDA6500FB56B9 /* SwainXPCService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4F41E65E2B6FDA6500FB56B9 /* Build configuration list for PBXNativeTarget "SwainXPCService" */;
+			buildPhases = (
+				4F41E64F2B6FDA6500FB56B9 /* Sources */,
+				4F41E6502B6FDA6500FB56B9 /* Frameworks */,
+				4F41E6512B6FDA6500FB56B9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwainXPCService;
+			productName = SwainXPCService;
+			productReference = 4F41E6532B6FDA6500FB56B9 /* SwainXPCService.xpc */;
+			productType = "com.apple.product-type.xpc-service";
+		};
 		4FE08D0A2B54EB1B003D9FE2 /* Swain */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4FE08D1E2B54EB1C003D9FE2 /* Build configuration list for PBXNativeTarget "Swain" */;
@@ -229,10 +341,12 @@
 				4FE08D072B54EB1B003D9FE2 /* Sources */,
 				4FE08D082B54EB1B003D9FE2 /* Frameworks */,
 				4FE08D092B54EB1B003D9FE2 /* Resources */,
+				4F41E6612B6FDA6500FB56B9 /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				4F41E65C2B6FDA6500FB56B9 /* PBXTargetDependency */,
 			);
 			name = Swain;
 			packageProductDependencies = (
@@ -249,8 +363,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1530;
 				LastUpgradeCheck = 1520;
 				TargetAttributes = {
+					4F41E6292B6FD8B400FB56B9 = {
+						CreatedOnToolsVersion = 15.3;
+					};
+					4F41E6522B6FDA6500FB56B9 = {
+						CreatedOnToolsVersion = 15.3;
+					};
 					4FE08D0A2B54EB1B003D9FE2 = {
 						CreatedOnToolsVersion = 15.2;
 					};
@@ -273,11 +394,29 @@
 			projectRoot = "";
 			targets = (
 				4FE08D0A2B54EB1B003D9FE2 /* Swain */,
+				4F41E6292B6FD8B400FB56B9 /* Swain_Sandboxed */,
+				4F41E6522B6FDA6500FB56B9 /* SwainXPCService */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		4F41E6282B6FD8B400FB56B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F41E64B2B6FD8D300FB56B9 /* Assets.xcassets in Resources */,
+				4F41E64C2B6FD8D300FB56B9 /* MainSidebarTableCellView.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4F41E6512B6FDA6500FB56B9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4FE08D092B54EB1B003D9FE2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -290,6 +429,38 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4F41E6262B6FD8B400FB56B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F41E6392B6FD8D300FB56B9 /* ToolchainsViewController.mm in Sources */,
+				4F41E63A2B6FD8D300FB56B9 /* AppDelegate.mm in Sources */,
+				4F41E63B2B6FD8D300FB56B9 /* MainWindow.mm in Sources */,
+				4F41E63C2B6FD8D300FB56B9 /* main.mm in Sources */,
+				4F41E63D2B6FD8D300FB56B9 /* MainSidebarTableCellView.mm in Sources */,
+				4F41E63E2B6FD8D300FB56B9 /* ToolchainsCollectionViewItem.mm in Sources */,
+				4F41E63F2B6FD8D300FB56B9 /* DownloadingToolchainsViewItem.mm in Sources */,
+				4F41E6402B6FD8D300FB56B9 /* NSObject+Foundation_IvarDescription.mm in Sources */,
+				4F41E6412B6FD8D300FB56B9 /* MainSidebarViewController.mm in Sources */,
+				4F41E6422B6FD8D300FB56B9 /* DownloadingToolchainsViewController.mm in Sources */,
+				4F41E6432B6FD8D300FB56B9 /* MainSidebarTableView.mm in Sources */,
+				4F41E6442B6FD8D300FB56B9 /* MainSidebarItemModel.mm in Sources */,
+				4F41E6452B6FD8D300FB56B9 /* ToolchainInspectorViewController.mm in Sources */,
+				4F41E6462B6FD8D300FB56B9 /* DownloadingToolchainsViewItemModel.mm in Sources */,
+				4F41E6472B6FD8D300FB56B9 /* NSTextField+ApplyLabelStyle.mm in Sources */,
+				4F41E6482B6FD8D300FB56B9 /* ToolchainsViewModel.mm in Sources */,
+				4F41E6492B6FD8D300FB56B9 /* getStringFromSwiftString.mm in Sources */,
+				4F41E64A2B6FD8D300FB56B9 /* DownloadingToolchainsViewModel.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4F41E64F2B6FDA6500FB56B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4FE08D072B54EB1B003D9FE2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -317,7 +488,118 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		4F41E65C2B6FDA6500FB56B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4F41E6522B6FDA6500FB56B9 /* SwainXPCService */;
+			targetProxy = 4F41E65B2B6FDA6500FB56B9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		4F41E6362B6FD8B500FB56B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Swain_Sandboxed/Swain_Sandboxed.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P53D29U9LJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pookjw.Swain-Sandboxed";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		4F41E6372B6FD8B500FB56B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Swain_Sandboxed/Swain_Sandboxed.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P53D29U9LJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pookjw.Swain-Sandboxed";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		4F41E65F2B6FDA6500FB56B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = SwainXPCService/SwainXPCService.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P53D29U9LJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SwainXPCService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SwainXPCService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pookjw.SwainXPCService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		4F41E6602B6FDA6500FB56B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = SwainXPCService/SwainXPCService.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P53D29U9LJ;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SwainXPCService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = SwainXPCService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pookjw.SwainXPCService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		4FE08D1C2B54EB1C003D9FE2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -327,7 +609,6 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -375,6 +656,10 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-fcxx-modules",
+				);
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -388,7 +673,6 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -429,6 +713,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-fcxx-modules",
+				);
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -452,10 +740,6 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-fcxx-modules",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pookjw.Swain;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -481,10 +765,6 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-fcxx-modules",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pookjw.Swain;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -494,6 +774,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4F41E6382B6FD8B500FB56B9 /* Build configuration list for PBXNativeTarget "Swain_Sandboxed" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F41E6362B6FD8B500FB56B9 /* Debug */,
+				4F41E6372B6FD8B500FB56B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4F41E65E2B6FDA6500FB56B9 /* Build configuration list for PBXNativeTarget "SwainXPCService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4F41E65F2B6FDA6500FB56B9 /* Debug */,
+				4F41E6602B6FDA6500FB56B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		4FE08D062B54EB1B003D9FE2 /* Build configuration list for PBXProject "Swain" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -522,6 +820,11 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		4F41E64D2B6FD8FD00FB56B9 /* SwainCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4FE08D212B54EB34003D9FE2 /* XCLocalSwiftPackageReference "SwainCore" */;
+			productName = SwainCore;
+		};
 		4FE08D222B54EB34003D9FE2 /* SwainCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SwainCore;
