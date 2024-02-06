@@ -7,14 +7,20 @@
 
 #if !SANDBOXED
 #import "HelperManager.hpp"
+#import <Security/Security.h>
 #import <ServiceManagement/ServiceManagement.h>
 #import <xpc/xpc.h>
+#import <CoreFoundation/CoreFoundation.h>
+#import <array>
+#import <algorithm>
 
 __attribute__((objc_direct_members))
 @interface HelperManager () {
     xpc_session_t _helperSession;
     SMAppService *_appService;
     dispatch_queue_t _queue;
+    AuthorizationRef _authRef;
+    CFDataRef _authData;
 }
 @property (assign, nonatomic, readonly) xpc_session_t helperSession;
 @property (retain, nonatomic, readonly) SMAppService *appService;
@@ -49,6 +55,14 @@ __attribute__((objc_direct_members))
         dispatch_release(_queue);
     }
     
+    if (_authRef) {
+        AuthorizationFree(_authRef, 0);
+    }
+    
+    if (_authData) {
+        CFRelease(_authData);
+    } 
+    
     [super dealloc];
 }
 
@@ -59,6 +73,7 @@ __attribute__((objc_direct_members))
         NSError * _Nullable error = nil;
         [appService registerAndReturnError:&error];
         
+        [self setupAuthorization];
         completionHandler(error);
     });
 }
@@ -70,6 +85,7 @@ __attribute__((objc_direct_members))
         NSError * _Nullable error = nil;
         [appService unregisterAndReturnError:&error];
         
+        [self clearAuthorization];
         completionHandler(error);
     });
 }
@@ -117,16 +133,76 @@ __attribute__((objc_direct_members))
 
 - (void)installPackageWithURL:(NSURL *)packageURL completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     dispatch_async(self.queue, ^{
-        xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
+        const std::array<const char *, 2> keys = {
+            "action",
+            "package_path"
+        };
+        
+        const std::array<xpc_object_t, 2> values {
+            xpc_string_create("install_package"),
+            xpc_string_create([packageURL.absoluteString cStringUsingEncoding:NSUTF8StringEncoding])
+        };
+        
+        xpc_object_t message = xpc_dictionary_create(keys.data(), values.data(), keys.size());
+        
+        std::for_each(values.cbegin(), values.cend(), [](auto value) {
+            xpc_release(value);
+        });
         
         xpc_session_send_message_with_reply_async(self.helperSession,
                                                   message,
                                                   ^(xpc_object_t  _Nullable reply, xpc_rich_error_t  _Nullable error) {
-            NSLog(@"Hello!");
+            const char *description = xpc_copy_description(reply);
+            NSLog(@"%s", description);
+            delete description;
         });
         
         xpc_release(message);
     });
+}
+
+- (void)setupAuthorization __attribute__((objc_direct)) {
+    OSStatus status_1 = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, 0, &_authRef);
+    assert(status_1 == errAuthorizationSuccess);
+    
+    AuthorizationExternalForm extForm;
+    OSStatus status_2 = AuthorizationMakeExternalForm(_authRef, &extForm);
+    assert(status_2 == errAuthorizationSuccess);
+    
+    _authData = CFDataCreate(kCFAllocatorDefault,
+                             reinterpret_cast<const UInt8 *>(&extForm),
+                             sizeof(extForm));
+    
+    CFDictionaryRef rightDefinition;
+    OSStatus status_3 = AuthorizationRightGet("Swain", &rightDefinition);
+//    CFShow(rightDefinition);
+    CFRelease(rightDefinition);
+    
+    if (status_3 == errAuthorizationDenied) {
+        CFStringRef rightDefinition = CFSTR(kAuthorizationRuleAuthenticateAsAdmin);
+        CFStringRef descriptionKey = CFSTR("TEST");
+        CFBundleRef bundle = CFBundleGetMainBundle();
+        
+        OSStatus status_4 = AuthorizationRightSet(_authRef,
+                                                  "Swain",
+                                                  rightDefinition,
+                                                  descriptionKey,
+                                                  bundle,
+                                                  NULL);
+        
+        CFRelease(rightDefinition);
+        CFRelease(descriptionKey);
+        CFRelease(bundle);
+        
+        assert(status_4 == errAuthorizationSuccess);
+    }
+}
+
+- (void)clearAuthorization __attribute__((objc_direct)) {
+    if (_authRef == NULL) return;
+    
+    OSStatus status = AuthorizationRightRemove(_authRef, "Swain");
+    assert(status == errAuthorizationSuccess);
 }
 
 @end

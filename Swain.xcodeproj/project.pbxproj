@@ -39,6 +39,8 @@
 		4F41E6782B6FEAA200FB56B9 /* com.pookjw.Swain.Helper.plist in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4F41E66F2B6FDC6200FB56B9 /* com.pookjw.Swain.Helper.plist */; };
 		4F68265C2B59692B0063018F /* ToolchainsViewModel.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */; };
 		4F6826662B5A16080063018F /* ToolchainsCollectionViewItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F6826652B5A16080063018F /* ToolchainsCollectionViewItem.mm */; };
+		4F713E682B72315300573A88 /* PackageInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F713E672B72315300573A88 /* PackageInstaller.swift */; };
+		4F713E912B723B4B00573A88 /* PackageKit.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F713E8F2B723B2E00573A88 /* PackageKit.tbd */; };
 		4F9162072B5BF4170068AE1F /* MainSidebarTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F9162062B5BF4170068AE1F /* MainSidebarTableView.mm */; };
 		4F9162312B5CC08F0068AE1F /* ToolchainInspectorViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F9162302B5CC08F0068AE1F /* ToolchainInspectorViewController.mm */; };
 		4FE08D102B54EB1B003D9FE2 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */; };
@@ -115,6 +117,13 @@
 		4F68265B2B59692B0063018F /* ToolchainsViewModel.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsViewModel.mm; sourceTree = "<group>"; };
 		4F6826642B5A16080063018F /* ToolchainsCollectionViewItem.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainsCollectionViewItem.hpp; sourceTree = "<group>"; };
 		4F6826652B5A16080063018F /* ToolchainsCollectionViewItem.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ToolchainsCollectionViewItem.mm; sourceTree = "<group>"; };
+		4F713E672B72315300573A88 /* PackageInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageInstaller.swift; sourceTree = "<group>"; };
+		4F713E692B72335800573A88 /* SwainHelper-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwainHelper-Bridging-Header.h"; sourceTree = "<group>"; };
+		4F713E802B72348500573A88 /* PKProduct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PKProduct.h; sourceTree = "<group>"; };
+		4F713E862B72350E00573A88 /* PKPackageSpecifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PKPackageSpecifier.h; sourceTree = "<group>"; };
+		4F713E892B72356400573A88 /* PKInstallRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PKInstallRequest.h; sourceTree = "<group>"; };
+		4F713E8C2B7235E200573A88 /* PKInstallClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PKInstallClient.h; sourceTree = "<group>"; };
+		4F713E8F2B723B2E00573A88 /* PackageKit.tbd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.text-based-dylib-definition"; path = PackageKit.tbd; sourceTree = "<group>"; };
 		4F9162052B5BF4170068AE1F /* MainSidebarTableView.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MainSidebarTableView.hpp; sourceTree = "<group>"; };
 		4F9162062B5BF4170068AE1F /* MainSidebarTableView.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MainSidebarTableView.mm; sourceTree = "<group>"; };
 		4F91622F2B5CC08F0068AE1F /* ToolchainInspectorViewController.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ToolchainInspectorViewController.hpp; sourceTree = "<group>"; };
@@ -160,6 +169,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F713E912B723B4B00573A88 /* PackageKit.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,8 +214,12 @@
 		4F41E6672B6FDB8800FB56B9 /* SwainHelper */ = {
 			isa = PBXGroup;
 			children = (
+				4F713E8F2B723B2E00573A88 /* PackageKit.tbd */,
 				4F41E6682B6FDB8800FB56B9 /* SwainHelper.swift */,
+				4F713E672B72315300573A88 /* PackageInstaller.swift */,
+				4F713E6C2B72335E00573A88 /* PackageKit */,
 				4F41E66D2B6FDBE500FB56B9 /* Info.plist */,
+				4F713E692B72335800573A88 /* SwainHelper-Bridging-Header.h */,
 			);
 			path = SwainHelper;
 			sourceTree = "<group>";
@@ -218,6 +232,17 @@
 				4F41E6732B6FDD5F00FB56B9 /* HelperManager.mm */,
 			);
 			path = Helper;
+			sourceTree = "<group>";
+		};
+		4F713E6C2B72335E00573A88 /* PackageKit */ = {
+			isa = PBXGroup;
+			children = (
+				4F713E802B72348500573A88 /* PKProduct.h */,
+				4F713E862B72350E00573A88 /* PKPackageSpecifier.h */,
+				4F713E892B72356400573A88 /* PKInstallRequest.h */,
+				4F713E8C2B7235E200573A88 /* PKInstallClient.h */,
+			);
+			path = PackageKit;
 			sourceTree = "<group>";
 		};
 		4F9161B12B5BC0120068AE1F /* Category */ = {
@@ -410,6 +435,7 @@
 					};
 					4F41E6652B6FDB8700FB56B9 = {
 						CreatedOnToolsVersion = 15.3;
+						LastSwiftMigration = 1530;
 					};
 					4FE08D0A2B54EB1B003D9FE2 = {
 						CreatedOnToolsVersion = 15.2;
@@ -492,6 +518,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4F41E6692B6FDB8800FB56B9 /* SwainHelper.swift in Sources */,
+				4F713E682B72315300573A88 /* PackageInstaller.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -592,14 +619,20 @@
 		4F41E66B2B6FDB8800FB56B9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = P53D29U9LJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/SwainHelper/Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SwainHelper",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pookjw.Swain.Helper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OBJC_BRIDGING_HEADER = "SwainHelper/SwainHelper-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -608,14 +641,20 @@
 		4F41E66C2B6FDB8800FB56B9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = P53D29U9LJ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/SwainHelper/Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/SwainHelper",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pookjw.Swain.Helper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "SwainHelper/SwainHelper-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
