@@ -102,7 +102,7 @@ namespace ns_MainWindow {
 - (void)commonInit_MainWindow __attribute__((objc_direct)) {
     self.title = @"Swain";
     self.movableByWindowBackground = YES;
-    self.contentMinSize = CGSizeMake(600.f, 400.f);
+    self.contentMinSize = CGSizeMake(800.f, 600.f);
     
     //
     

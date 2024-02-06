@@ -40,14 +40,6 @@ __attribute__((objc_direct_members))
     return object;
 }
 
-- (instancetype)init {
-    if (self = [super init]) {
-        NSLog(@"%d", _helperSession == NULL);
-    }
-    
-    return self;
-}
-
 - (void)dealloc {
     [_appService release];
     
@@ -61,19 +53,20 @@ __attribute__((objc_direct_members))
     
     if (_authData) {
         CFRelease(_authData);
-    } 
+    }
     
     [super dealloc];
 }
 
 - (void)installHelperWithCompletionHandler:(void (^)(NSError * _Nullable error))completionHandler {
     dispatch_async(self.queue, ^{
+        [self setupAuthorization];
+        
         SMAppService *appService = self.appService;
         
         NSError * _Nullable error = nil;
         [appService registerAndReturnError:&error];
         
-        [self setupAuthorization];
         completionHandler(error);
     });
 }
@@ -173,10 +166,7 @@ __attribute__((objc_direct_members))
                              reinterpret_cast<const UInt8 *>(&extForm),
                              sizeof(extForm));
     
-    CFDictionaryRef rightDefinition;
-    OSStatus status_3 = AuthorizationRightGet("Swain", &rightDefinition);
-//    CFShow(rightDefinition);
-    CFRelease(rightDefinition);
+    OSStatus status_3 = AuthorizationRightGet("Swain", NULL);
     
     if (status_3 == errAuthorizationDenied) {
         CFStringRef rightDefinition = CFSTR(kAuthorizationRuleAuthenticateAsAdmin);
@@ -203,6 +193,14 @@ __attribute__((objc_direct_members))
     
     OSStatus status = AuthorizationRightRemove(_authRef, "Swain");
     assert(status == errAuthorizationSuccess);
+    
+    if (_authRef) {
+        AuthorizationFree(_authRef, 0);
+    }
+    
+    if (_authData) {
+        CFRelease(_authData);
+    }
 }
 
 @end

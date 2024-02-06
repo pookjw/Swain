@@ -5,7 +5,7 @@
 	<key>KeepAlive</key>
 	<true/>
 	<key>WaitForDebugger</key>
-	<true/>
+	<false/>
 	<key>Label</key>
 	<string>com.pookjw.Swain.Helper</string>
 	<key>BundleProgram</key>

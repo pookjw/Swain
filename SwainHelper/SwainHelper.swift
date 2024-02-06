@@ -8,6 +8,8 @@
 import Foundation
 import XPC
 
+// TODO: Authorization
+
 @main
 struct SwainHelper {
     static func main() throws {

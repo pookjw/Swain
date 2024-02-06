@@ -7,7 +7,7 @@
 
 #import "AppDelegate.hpp"
 #import "MainWindow.hpp"
-#import "HelperManager.hpp"
+#import "BaseMenu.hpp"
 
 __attribute__((objc_direct_members))
 @interface AppDelegate ()
@@ -21,14 +21,9 @@ __attribute__((objc_direct_members))
     [window makeKeyAndOrderFront:self];
     [window release];
     
-#if !SANDBOXED
-    [HelperManager.sharedInstance uninstallHelperWithCompletionHandler:^(NSError * _Nullable error) {
-        NSLog(@"%@", error);
-        [HelperManager.sharedInstance installHelperWithCompletionHandler:^(NSError * _Nullable error) {
-            NSLog(@"%@", error);
-        }];
-    }];
-#endif
+    BaseMenu *baseMenu = [BaseMenu new];
+    NSApp.mainMenu = baseMenu;
+    [baseMenu release];
 }
 
 
