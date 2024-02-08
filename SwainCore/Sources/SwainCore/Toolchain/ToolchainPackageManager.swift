@@ -158,6 +158,12 @@ public actor ToolchainPackageManager {
     private nonisolated var mdQueryInitlaizer: Void {
         @storageRestrictions(initializes: mdQuery, accesses: downloadsURL, mdQueryWeakPtrContext, notificationCallback)
         init(__) {
+            if access(downloadsURL.path(percentEncoded: false).cString(using: .utf8), F_OK) != .zero {
+//                let result: Int32 = mkdir(downloadsURL.path(percentEncoded: false), S_IRWXU | S_IRWXG | S_IRWXO)
+//                assert(result == .zero)
+                try! FileManager.default.createDirectory(at: downloadsURL, withIntermediateDirectories: true)
+            }
+            
             let queryString: CFString = withVaList(
                 [
                     CFStringGetCStringPtr(kMDItemContentType, CFStringBuiltInEncodings.UTF8.rawValue),

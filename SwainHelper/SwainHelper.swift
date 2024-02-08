@@ -44,7 +44,7 @@ struct SwainHelper {
             let xpcDictionary: XPCDictionary = receivedMessage.dictionary,
             let action: String = xpcDictionary["action"],
             let authExtForm: xpc_object_t = xpcDictionary["authorization_external_form"],
-            xpc_data_get_length(authExtForm) == MemoryLayout<AuthorizationRef>.size,
+            xpc_data_get_length(authExtForm) == MemoryLayout<AuthorizationExternalForm>.size,
             let authExtFormRawData: UnsafeRawPointer = xpc_data_get_bytes_ptr(authExtForm)
         else {
             fatalError()
@@ -82,29 +82,29 @@ struct SwainHelper {
         let status_1: OSStatus = AuthorizationCreateFromExternalForm(data, &authRef)
         assert(status_1 == errAuthorizationSuccess)
         
-        let authItem: AuthorizationItem = "Swain".withCString { ptr in
-            return .init(
-                name: ptr,
-                valueLength: .zero,
-                value: nil,
-                flags: .zero
-            )
-        }
-        
-        let authRights: AuthorizationRights = withUnsafePointer(to: authItem) { ptr in
-            return .init(count: 1, items: .init(mutating: ptr))
-        }
-        
         let _: Void = await withCheckedContinuation { continuation in
-            withUnsafePointer(to: authRights) { ptr in
-                AuthorizationCopyRightsAsync(
-                    authRef!, 
-                    ptr,
-                    nil,
-                    [.extendRights, .interactionAllowed]
-                ) { status_2, _ in
-                    assert(status_2 == errAuthorizationSuccess)
-                    continuation.resume(with: .success(()))
+            "Swain".withCString { namePtr in
+                let authItem: AuthorizationItem = .init(
+                    name: namePtr,
+                    valueLength: .zero,
+                    value: nil,
+                    flags: .zero
+                )
+                
+                withUnsafePointer(to: authItem) { authPtr in
+                    let authRights: AuthorizationRights = .init(count: 1, items: .init(mutating: authPtr))
+                    
+                    withUnsafePointer(to: authRights) { ptr in
+                        AuthorizationCopyRightsAsync(
+                            authRef!,
+                            ptr,
+                            nil,
+                            [.extendRights, .interactionAllowed]
+                        ) { status_2, _ in
+                            assert(status_2 == errAuthorizationSuccess)
+                            continuation.resume(with: .success(()))
+                        }
+                    }
                 }
             }
         }
