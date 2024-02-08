@@ -7,6 +7,7 @@
 
 import Foundation
 import XPC
+import Security
 
 // TODO: Authorization
 
@@ -21,8 +22,10 @@ struct SwainHelper {
             options: .inactive
         ) { request in
             return request.accept { (receivedMessage: XPCReceivedMessage) in
-                receivedMessage.handoffReply(to: .global()) { 
-                    handle(receivedMessage: receivedMessage)
+                receivedMessage.handoffReply(to: .global()) {
+                    Task {
+                        try! await handle(receivedMessage: receivedMessage)
+                    }
                 }
             } cancellationHandler: { (error: XPCRichError) in
                 
@@ -36,13 +39,22 @@ struct SwainHelper {
         CFRunLoopRun()
     }
     
-    private static func handle(receivedMessage: XPCReceivedMessage) {
+    private static func handle(receivedMessage: XPCReceivedMessage) async throws {
         guard 
             let xpcDictionary: XPCDictionary = receivedMessage.dictionary,
-            let action: String = xpcDictionary["action"]
+            let action: String = xpcDictionary["action"],
+            let authExtForm: xpc_object_t = xpcDictionary["authorization_external_form"],
+            xpc_data_get_length(authExtForm) == MemoryLayout<AuthorizationRef>.size,
+            let authExtFormRawData: UnsafeRawPointer = xpc_data_get_bytes_ptr(authExtForm)
         else {
             fatalError()
         }
+        
+        let authExtFormData: UnsafePointer<AuthorizationExternalForm> = authExtFormRawData.assumingMemoryBound(to: AuthorizationExternalForm.self)
+        let authorized: Bool = await authorize(data: authExtFormData)
+        assert(authorized)
+        
+        //
         
         switch action {
         case "install_package":
@@ -53,17 +65,52 @@ struct SwainHelper {
                 fatalError()
             }
             
-            Task {
-                try! await installPackage(packageURL: packageURL)
-                
-                var replyDictionary: XPCDictionary = .init()
-                replyDictionary["success"] = true
-                
-                receivedMessage.reply(replyDictionary)
-            }
+            try await installPackage(packageURL: packageURL)
+            
+            var replyDictionary: XPCDictionary = .init()
+            replyDictionary["success"] = true
+            
+            receivedMessage.reply(replyDictionary)
         default:
             fatalError()
         }
+    }
+    
+    private static func authorize(data: UnsafePointer<AuthorizationExternalForm>) async -> Bool {
+        var authRef: AuthorizationRef? = nil
+        
+        let status_1: OSStatus = AuthorizationCreateFromExternalForm(data, &authRef)
+        assert(status_1 == errAuthorizationSuccess)
+        
+        let authItem: AuthorizationItem = "Swain".withCString { ptr in
+            return .init(
+                name: ptr,
+                valueLength: .zero,
+                value: nil,
+                flags: .zero
+            )
+        }
+        
+        let authRights: AuthorizationRights = withUnsafePointer(to: authItem) { ptr in
+            return .init(count: 1, items: .init(mutating: ptr))
+        }
+        
+        let _: Void = await withCheckedContinuation { continuation in
+            withUnsafePointer(to: authRights) { ptr in
+                AuthorizationCopyRightsAsync(
+                    authRef!, 
+                    ptr,
+                    nil,
+                    [.extendRights, .interactionAllowed]
+                ) { status_2, _ in
+                    assert(status_2 == errAuthorizationSuccess)
+                    continuation.resume(with: .success(()))
+                }
+            }
+        }
+        
+        AuthorizationFree(authRef!, .init(rawValue: .zero))
+        return true
     }
     
     private static func installPackage(packageURL: URL) async throws {

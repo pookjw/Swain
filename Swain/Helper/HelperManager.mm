@@ -126,13 +126,15 @@ __attribute__((objc_direct_members))
 
 - (void)installPackageWithURL:(NSURL *)packageURL completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     dispatch_async(self.queue, ^{
-        const std::array<const char *, 2> keys = {
+        const std::array<const char *, 3> keys = {
             "action",
+            "authorization_external_form",
             "package_path"
         };
         
-        const std::array<xpc_object_t, 2> values {
+        const std::array<xpc_object_t, 3> values {
             xpc_string_create("install_package"),
+            xpc_data_create(CFDataGetBytePtr(_authData), CFDataGetLength(_authData)),
             xpc_string_create([packageURL.absoluteString cStringUsingEncoding:NSUTF8StringEncoding])
         };
         
