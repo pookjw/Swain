@@ -193,14 +193,13 @@ __attribute__((objc_direct_members))
 #if SANDBOXED
         [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[downloadedURL]];
 #else
-//        [HelperManager.sharedInstance installPackageWithURL:downloadedURL completionHandler:^(NSError * _Nullable error) {
-//            assert(!error);
-        NSLog(@"%@", self.itemModel.toolchainPackage.name);
+        [HelperManager.sharedInstance installPackageWithURL:downloadedURL completionHandler:^(NSError * _Nullable error) {
+            assert(!error);
             
             SwainCore::XcodeManager::getSharedInstance().changeSelectedToolchain([self.itemModel.toolchainPackage.name cStringUsingEncoding:NSUTF8StringEncoding], ^(NSError * _Nullable error) {
                 assert(!error);
             });
-//        }];
+        }];
 #endif
     }
 }
