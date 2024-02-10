@@ -10,8 +10,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+namespace ns_HelperManager {
+    extern NSNotificationName const isInstalledDidChangeNotification;
+    extern NSString * const isInstalledKey;
+}
+
 __attribute__((objc_direct_members))
 @interface HelperManager : NSObject
+@property (assign, readonly, nonatomic) BOOL isInstalled;
 + (instancetype)sharedInstance;
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;

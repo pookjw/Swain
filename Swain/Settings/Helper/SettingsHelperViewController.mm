@@ -58,6 +58,12 @@ __attribute__((objc_direct_members))
         [stackView.trailingAnchor constraintLessThanOrEqualToAnchor:view.trailingAnchor],
         [stackView.bottomAnchor constraintLessThanOrEqualToAnchor:view.bottomAnchor]
     ]];
+    
+    [self updateHelperStatusTextFieldWithIsInstalled:HelperManager.sharedInstance.isInstalled];
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(isIntalledDidChange:)
+                                               name:ns_HelperManager::isInstalledDidChangeNotification
+                                             object:HelperManager.sharedInstance];
 }
 
 - (NSStackView *)stackView {
@@ -133,6 +139,18 @@ __attribute__((objc_direct_members))
 
 - (void)pingPongButtonDidTrigger:(NSButton *)sender {
     
+}
+
+- (void)isIntalledDidChange:(NSNotification *)notification {
+    BOOL isInstalled = reinterpret_cast<NSNumber *>(notification.userInfo[ns_HelperManager::isInstalledKey]).boolValue;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateHelperStatusTextFieldWithIsInstalled:isInstalled];
+    });
+}
+
+- (void)updateHelperStatusTextFieldWithIsInstalled:(BOOL)isInstalled __attribute__((objc_direct)) {
+    self.helperStatusTextField.stringValue = isInstalled ? @"Installed" : @"Not Installed";
 }
 
 @end

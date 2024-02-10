@@ -14,15 +14,20 @@
 #import <array>
 #import <algorithm>
 
+namespace ns_HelperManager {
+    void *context = &context;
+    extern NSNotificationName const isInstalledDidChangeNotification = @"HelperManagerIsInstalledDidChangeNotification";
+    extern NSString * const isInstalledKey = @"isInstalled";
+}
+
 __attribute__((objc_direct_members))
 @interface HelperManager () {
-    xpc_session_t _helperSession;
     SMAppService *_appService;
     dispatch_queue_t _queue;
     AuthorizationRef _authRef;
     CFDataRef _authData;
 }
-@property (assign, nonatomic, readonly) xpc_session_t helperSession;
+@property (retain, nonatomic) xpc_session_t _Nullable helperSession;
 @property (retain, nonatomic, readonly) SMAppService *appService;
 @property (retain, nonatomic, readonly) dispatch_queue_t queue;
 @end
@@ -40,8 +45,18 @@ __attribute__((objc_direct_members))
     return object;
 }
 
+- (instancetype)init {
+    if (self = [super init]) {
+        
+    }
+    
+    return self;
+}
+
 - (void)dealloc {
-    [_appService release];
+    if (_appService) {
+        [_appService release];
+    }
     
     if (_queue) {
         dispatch_release(_queue);
@@ -55,30 +70,50 @@ __attribute__((objc_direct_members))
         CFRelease(_authData);
     }
     
+    if (_helperSession) {
+        xpc_session_cancel(_helperSession);
+        xpc_release(reinterpret_cast<xpc_object_t>(_helperSession));
+    }
+    
     [super dealloc];
 }
 
 - (void)installHelperWithCompletionHandler:(void (^)(NSError * _Nullable error))completionHandler {
     dispatch_async(self.queue, ^{
-        [self setupAuthorization];
-        
-        SMAppService *appService = self.appService;
-        
         NSError * _Nullable error = nil;
-        [appService registerAndReturnError:&error];
-        
+        [self queue_installHelperWithError:&error];
         completionHandler(error);
     });
 }
 
+- (void)queue_installHelperWithError:(NSError * __autoreleasing * _Nullable)error __attribute__((objc_direct)) {
+    if (self.appService.status == SMAppServiceStatusEnabled) {
+        return;
+    }
+    
+    [self.appService registerAndReturnError:error];
+    [self setupAuthorization];
+    [self setupHelperSession];
+    [self serviceStatusDidChange:self.appService.status];
+}
+
 - (void)uninstallHelperWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
     dispatch_async(self.queue, ^{
-        SMAppService *appService = self.appService;
+        if (self.appService.status != SMAppServiceStatusEnabled) {
+            return;
+        }
+        
+        [self clearHelperSession];
+        [self clearAuthorization];
         
         NSError * _Nullable error = nil;
-        [appService unregisterAndReturnError:&error];
+        [self.appService unregisterAndReturnError:&error];
         
-        [self clearAuthorization];
+        // FB13604150
+        [NSThread sleepForTimeInterval:2.f];
+        
+        [self serviceStatusDidChange:self.appService.status];
+        
         completionHandler(error);
     });
 }
@@ -102,8 +137,8 @@ __attribute__((objc_direct_members))
     return queue;
 }
 
-- (xpc_session_t)helperSession {
-    if (auto helperSession = _helperSession) return helperSession;
+- (void)setupHelperSession  __attribute__((objc_direct)) {
+    if (self.helperSession != NULL) return;
     
     xpc_rich_error_t richError = NULL;
     
@@ -120,12 +155,27 @@ __attribute__((objc_direct_members))
         @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:string userInfo:nil];
     }
     
-    _helperSession = helperSession;
-    return helperSession;
+    self.helperSession = helperSession;
+}
+
+- (void)clearHelperSession  __attribute__((objc_direct)) {
+    xpc_session_t helperSession = self.helperSession;
+    if (helperSession == NULL) return;
+    
+    xpc_session_cancel(helperSession);
+    self.helperSession = NULL;
 }
 
 - (void)installPackageWithURL:(NSURL *)packageURL completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     dispatch_async(self.queue, ^{
+        NSError * _Nullable error = nil;
+        [self queue_installHelperWithError:&error];
+        
+        if (error) {
+            completionHandler(error);
+            return;
+        }
+        
         const std::array<const char *, 3> keys = {
             "action",
             "authorization_external_form",
@@ -150,6 +200,7 @@ __attribute__((objc_direct_members))
             const char *description = xpc_copy_description(reply);
             NSLog(@"%s", description);
             delete description;
+            completionHandler(nil);
         });
         
         xpc_release(message);
@@ -203,6 +254,24 @@ __attribute__((objc_direct_members))
     if (_authData) {
         CFRelease(_authData);
     }
+}
+
+- (BOOL)isInstalled {
+    return self.appService.status == SMAppServiceStatusEnabled;
+}
+
+- (void)serviceStatusDidChange:(SMAppServiceStatus)status __attribute__((objc_direct)) {
+    if (status == SMAppServiceStatusEnabled) {
+        [self setupAuthorization];
+        [self setupHelperSession];
+    } else {
+        [self clearAuthorization];
+        [self clearHelperSession];
+    }
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:ns_HelperManager::isInstalledDidChangeNotification
+                                                      object:self
+                                                    userInfo:@{ns_HelperManager::isInstalledKey: @(status)}];
 }
 
 @end

@@ -586,12 +586,26 @@ extension ToolchainPackageManager {
                 continue
             }
             
-            let name: String = .init(
+            let fileName: String = .init(
                 cString: CFStringGetCStringPtr(
                     unsafeBitCast(nameRef, to: CFString.self),
                     CFStringBuiltInEncodings.UTF8.rawValue
                 )
             )
+            
+            let regex: Regex = .init {
+                Capture {
+                    OneOrMore(.any)
+                }
+                "-osx.pkg"
+            }
+            
+            let name: String
+            if let match: Substring = fileName.firstMatch(of: regex)?.output.1 {
+                name = .init(match)
+            } else {
+                name = fileName
+            }
             
             let date: FoundationEssentials.Date = .init(
                 timeIntervalSinceReferenceDate: CFDateGetAbsoluteTime(

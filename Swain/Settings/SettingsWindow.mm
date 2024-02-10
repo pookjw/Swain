@@ -70,7 +70,7 @@ __attribute__((objc_direct_members))
     NSTabViewController *tabViewController = [NSTabViewController new];
     tabViewController.tabStyle = NSTabViewControllerTabStyleToolbar;
     
-    _tabViewController = tabViewController;
+    _tabViewController = [tabViewController retain];
     return [tabViewController autorelease];
 }
 

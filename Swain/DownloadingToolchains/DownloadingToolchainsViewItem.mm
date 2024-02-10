@@ -9,6 +9,7 @@
 #import "NSView+Private.h"
 #import "NSTextField+ApplyLabelStyle.hpp"
 #import "HelperManager.hpp"
+@import SwainCore;
 
 namespace ns_DownloadingToolchainsViewItem {
     NSUserInterfaceItemIdentifier const identifier = NSStringFromClass(DownloadingToolchainsViewItem.class);
@@ -192,9 +193,14 @@ __attribute__((objc_direct_members))
 #if SANDBOXED
         [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[downloadedURL]];
 #else
-        [HelperManager.sharedInstance installPackageWithURL:downloadedURL completionHandler:^(NSError * _Nullable error) {
-            assert(!error);
-        }];
+//        [HelperManager.sharedInstance installPackageWithURL:downloadedURL completionHandler:^(NSError * _Nullable error) {
+//            assert(!error);
+        NSLog(@"%@", self.itemModel.toolchainPackage.name);
+            
+            SwainCore::XcodeManager::getSharedInstance().changeSelectedToolchain([self.itemModel.toolchainPackage.name cStringUsingEncoding:NSUTF8StringEncoding], ^(NSError * _Nullable error) {
+                assert(!error);
+            });
+//        }];
 #endif
     }
 }
