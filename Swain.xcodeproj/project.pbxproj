@@ -47,6 +47,7 @@
 		4F713EA02B7285A500573A88 /* SettingsWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F713E9F2B7285A500573A88 /* SettingsWindow.mm */; };
 		4F713EA82B728A7000573A88 /* SettingsHelperViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F713EA72B728A7000573A88 /* SettingsHelperViewController.mm */; };
 		4F713EAC2B728C0E00573A88 /* SettingsGeneralViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F713EAB2B728C0E00573A88 /* SettingsGeneralViewController.mm */; };
+		4F82BE8E2B78AA9700CDCCD0 /* SwainCore in Frameworks */ = {isa = PBXBuildFile; productRef = 4F82BE8D2B78AA9700CDCCD0 /* SwainCore */; };
 		4F9162072B5BF4170068AE1F /* MainSidebarTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F9162062B5BF4170068AE1F /* MainSidebarTableView.mm */; };
 		4F9162312B5CC08F0068AE1F /* ToolchainInspectorViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F9162302B5CC08F0068AE1F /* ToolchainInspectorViewController.mm */; };
 		4FE08D102B54EB1B003D9FE2 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4FE08D0F2B54EB1B003D9FE2 /* AppDelegate.mm */; };
@@ -187,6 +188,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F82BE8E2B78AA9700CDCCD0 /* SwainCore in Frameworks */,
 				4F713E912B723B4B00573A88 /* PackageKit.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -464,6 +466,9 @@
 			dependencies = (
 			);
 			name = SwainHelper;
+			packageProductDependencies = (
+				4F82BE8D2B78AA9700CDCCD0 /* SwainCore */,
+			);
 			productName = SwainHelper;
 			productReference = 4F41E6662B6FDB8700FB56B9 /* SwainHelper */;
 			productType = "com.apple.product-type.tool";
@@ -709,6 +714,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "SwainHelper/SwainHelper-Bridging-Header.h";
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -731,6 +737,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OBJC_BRIDGING_HEADER = "SwainHelper/SwainHelper-Bridging-Header.h";
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -958,6 +965,11 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		4F41E64D2B6FD8FD00FB56B9 /* SwainCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4FE08D212B54EB34003D9FE2 /* XCLocalSwiftPackageReference "SwainCore" */;
+			productName = SwainCore;
+		};
+		4F82BE8D2B78AA9700CDCCD0 /* SwainCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4FE08D212B54EB34003D9FE2 /* XCLocalSwiftPackageReference "SwainCore" */;
 			productName = SwainCore;

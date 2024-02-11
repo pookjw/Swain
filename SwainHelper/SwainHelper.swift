@@ -8,8 +8,7 @@
 import Foundation
 import XPC
 import Security
-
-// TODO: Authorization
+import SwainCore
 
 @main
 struct SwainHelper {
