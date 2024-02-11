@@ -575,7 +575,7 @@ extension ToolchainPackageManager {
             return
         }
         
-        var metadata: [(String, FoundationEssentials.Date)] = .init()
+        var metadata: [(String, String, FoundationEssentials.Date)] = .init()
         
         for i in 0..<count {
             guard let nameRef: UnsafeMutableRawPointer = MDQueryGetAttributeValueOfResultAtIndex(query, kMDItemFSName, i) else {
@@ -613,7 +613,7 @@ extension ToolchainPackageManager {
                 )
             )
             
-            metadata.append((name, date))
+            metadata.append((name, fileName, date))
         }
         
         Task { [metadata] in
@@ -621,7 +621,7 @@ extension ToolchainPackageManager {
         }
     }
     
-    private func updateToolchainPackages(metadata: [(String, FoundationEssentials.Date)]) {
+    private func updateToolchainPackages(metadata: [(name: String, fileName: String, creationDate: FoundationEssentials.Date)]) {
         guard !metadata.isEmpty else {
             return
         }
@@ -629,16 +629,20 @@ extension ToolchainPackageManager {
         var toolchainPackages: [ToolchainPackage] = toolchainPackages
         
         for datum in metadata {
-            guard !toolchainPackages.contains(where: { $0.name == datum.0 }) else {
+            let name: String = datum.0
+            let fileName: String = datum.1
+            let creationDate: FoundationEssentials.Date = datum.2
+            
+            guard !toolchainPackages.contains(where: { $0.name == name }) else {
                 continue
             }
             
             let url: Foundation.URL = downloadsURL
-                .appending(component: datum.0, directoryHint: .notDirectory)
+                .appending(component: fileName, directoryHint: .notDirectory)
             
             let toolchainPackage: ToolchainPackage = .init(
-                name: datum.0,
-                creationDate: datum.1,
+                name: name,
+                creationDate: creationDate,
                 state: .downloaded(url)
             )
             
